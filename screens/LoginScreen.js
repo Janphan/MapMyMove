@@ -2,17 +2,31 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Text, Alert, StyleSheet } from 'react-native';
 import { login } from '../services/authService';
 
+// Helper function for email validation
+const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // Basic email validation regex
+    return emailRegex.test(email);
+};
+
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
+        if (!validateEmail(email)) {
+            Alert.alert('Error', 'Please enter a valid email address.');
+            return;
+        }
+        if (password.length < 6) {
+            Alert.alert('Error', 'Password must be at least 6 characters.');
+            return;
+        }
         try {
             await login(email, password);  // Call the login function from authService
             Alert.alert('Success', 'Logged in successfully!');
             navigation.navigate('Home');  // Navigate to the Home screen after successful login
         } catch (error) {
-            Alert.alert('Error', error.message);  // Show an error message if something goes wrong
+            Alert.alert('Error', `Error logging in: ${error.message}`);  // Show an error message if something goes wrong
         }
     };
 
@@ -34,12 +48,8 @@ export default function LoginScreen({ navigation }) {
                 onChangeText={setPassword}
                 secureTextEntry
             />
-            <View>
-                <Button title="Log In" onPress={handleLogin} />
-                <Button title="Sign up" onPress={handleLogin} />
-                {/* draft function, implement later */}
-            </View>
-
+            <Button title="Log In" onPress={handleLogin} />
+            <Button title="Sign Up" onPress={() => navigation.navigate('Signup')} />
         </View>
     );
 }
@@ -62,7 +72,7 @@ const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 8,
         borderWidth: 1,
-        borderColor: '#ccc',       // Light gray border
+        borderColor: '#ccc',
         borderRadius: 5,
     },
 });
