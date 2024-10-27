@@ -1,18 +1,90 @@
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, StyleSheet, FlatList, ImageBackground } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebaseConfig';
+const activities = [
+    { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km' },  // Example for yesterday
+    { id: '2', type: 'Walk', date: '2024-10-25', distance: '3 km' },  // Example for the day before
+];
 
-export default function HomeScreen() {
+const HomeScreen = () => {
+    const navigation = useNavigation();
+    const [yesterdaysActivities, setYesterdaysActivities] = useState([]);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((authUser) => {
+            setUser(authUser);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogout = () => {
+        auth.signOut().then(() => {
+            console.log("User logged out");
+            navigation.navigate("Login")
+        }).catch((error) => {
+            console.error("Error logging out:", error)
+        })
+    }
     return (
-        <View style={styles.container}>
-            <Text>Welcome to our App!</Text>
-        </View>
+        <ImageBackground
+            source={{ uri: "https://img.goodfon.com/wallpaper/big/5/22/sneakers-outdoors-running-jogging.webp" }}
+            style={styles.background}
+        >
+            <View style={styles.container}>
+                {/* Greeting Message */}
+                <Text style={styles.greeting}>Hi, {user ? user.displayName : 'User'}!</Text>
+
+                <Text style={styles.subtitle}>Yesterday's Activities</Text>
+                {/* <FlatList
+                    data={yesterdaysActivities}
+                    renderItem={renderActivityItem}
+                    keyExtractor={item => item.id}
+                    style={styles.activityList}
+                /> */}
+
+                <Button title="Start New Activity" onPress={() => navigation.navigate('Start')} />
+                {/* Logout Button */}
+                <Button title="Log Out" onPress={handleLogout} color="red" />
+            </View>
+        </ImageBackground>
     );
-}
+};
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1, // Ensure background image covers the entire screen
+        justifyContent: 'center', // Center content
+        alignItems: 'center', // Align content to center
+    },
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+        padding: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: semi-transparent background for better text visibility
+        borderRadius: 10,
+        margin: 10,
+    },
+    greeting: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginTop: 20,
+    },
+    activityItem: {
+        padding: 15,
+        marginVertical: 5,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 5,
+    },
+    activityList: {
+        marginTop: 10,
     },
 });
+
+export default HomeScreen;
