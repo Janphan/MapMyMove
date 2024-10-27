@@ -4,7 +4,7 @@ import HomeScreen from './screens/HomeScreen';
 import SettingScreen from './screens/SettingScreen';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
-import Calendar from './screens/Calendar';
+import CalendarComponent from './screens/Calendar';
 import TrackMove from './screens/TrackMove';
 import SignupScreen from './screens/SignupScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -51,7 +51,7 @@ function AppTabs() {
       })}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Start" component={TrackMove} />
-      <Tab.Screen name="Calendar" component={Calendar} />
+      <Tab.Screen name="Calendar" component={CalendarComponent} />
       <Tab.Screen name="Settings" component={SettingScreen} />
     </Tab.Navigator>
   );
