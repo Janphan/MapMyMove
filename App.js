@@ -15,7 +15,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-
 function AuthStack() {
   return (
     <Stack.Navigator>
@@ -58,16 +57,26 @@ function AppTabs() {
 }
 export default function App() {
   const [user, setUser] = useState(null);
+  const [initializing, setInitializing] = useState(true);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      setUser(authUser); // Set the user if authenticated, otherwise null
+      setUser(authUser);
+      if (initializing) setInitializing(false); // Disable loading
     });
-    return unsubscribe; // Cleanup subscription on unmount
+    return unsubscribe;
   }, []);
+
+  if (initializing) return null;
 
   return (
     <NavigationContainer>
-      {user ? <AppTabs /> : <AuthStack />}
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          <Stack.Screen name="AppTabs" component={AppTabs} />
+        ) : (
+          <Stack.Screen name="AuthStack" component={AuthStack} />
+        )}
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

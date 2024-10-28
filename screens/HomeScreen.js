@@ -23,7 +23,7 @@ const HomeScreen = () => {
     const handleLogout = () => {
         auth.signOut().then(() => {
             console.log("User logged out");
-            navigation.navigate("Login")
+            navigation.navigate('AuthStack', { screen: 'Login' })
         }).catch((error) => {
             console.error("Error logging out:", error)
         })

@@ -24,7 +24,7 @@ export default function LoginScreen({ navigation }) {
         try {
             await login(email, password);  // Call the login function from authService
             Alert.alert('Success', 'Logged in successfully!');
-            navigation.navigate('Home');  // Navigate to the Home screen after successful login
+            navigation.navigate('AppTabs', { screen: 'Home' });  // Navigate to the Home screen after successful login
         } catch (error) {
             Alert.alert('Error', `Error logging in: ${error.message}`);  // Show an error message if something goes wrong
         }
