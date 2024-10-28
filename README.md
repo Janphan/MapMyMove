@@ -23,8 +23,6 @@ Designed for users who want to monitor their movement and schedule, the app offe
 **Firebase Authentication:** Secure, easy-to-implement authentication for user login and registration.
 
 **react-native-maps:** For displaying the route on a map.
-  
-**expo-location: ** For accessing the device’s location in real-time.
 
 ### UI and Icons:
 
