@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, FlatList, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebaseConfig';
+
 const activities = [
     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km' },  // Example for yesterday
     { id: '2', type: 'Walk', date: '2024-10-25', distance: '3 km' },  // Example for the day before
@@ -10,7 +11,7 @@ const activities = [
 const HomeScreen = () => {
     const navigation = useNavigation();
     const [yesterdaysActivities, setYesterdaysActivities] = useState([]);
-    const [user, setUser] = useState(null);
+    const username = auth.currentUser?.displayName || 'User';
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
@@ -35,7 +36,7 @@ const HomeScreen = () => {
         >
             <View style={styles.container}>
                 {/* Greeting Message */}
-                <Text style={styles.greeting}>Hi, {user ? user.displayName : 'User'}!</Text>
+                <Text style={styles.greeting}>Welcome, {username}!</Text>
 
                 <Text style={styles.subtitle}>Yesterday's Activities</Text>
                 {/* <FlatList
