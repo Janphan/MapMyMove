@@ -1,7 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import MyMap from '../components/MyMap';
+import { useNavigation } from '@react-navigation/native';
+
 export default function TrackMove() {
+    const navigation = useNavigation();
     const [marker, setMarker] = useState(null);
     const [region, setRegion] = useState({
         latitude: 60.200692,
@@ -37,8 +40,20 @@ export default function TrackMove() {
     }, []);
     return (
         <View style={styles.container}>
-            <MyMap region={region} marker={marker} />
+            <View style={styles.mapContainer}>
+                <MyMap region={region} marker={marker} />
+            </View>
+            <View style={styles.buttonContainer}>
+                <Button
+                    title="Go to Track List"
+                    onPress={() => {
+                        console.log("Navigating to TrackList...");
+                        navigation.navigate('TrackList');
+                    }}
+                />
+            </View>
         </View>
+
     );
 }
 
@@ -46,7 +61,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+    },
+    mapContainer: {
+        flex: 12,  // 80% of the screen height
+        width: '100%',
+    },
+    buttonContainer: {
+        flex: 1,  // 20% of the screen height
+        paddingBottom: 20,
+        alignSelf: 'center',
+        width: '80%',
     },
 });
