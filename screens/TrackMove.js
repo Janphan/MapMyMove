@@ -2,10 +2,13 @@ import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import MyMap from '../components/MyMap';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { app } from '../firebaseConfig';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
 export default function TrackMove() {
+    const db = getFirestore(app);
     const navigation = useNavigation();
     const [marker, setMarker] = useState(null);
     const [region, setRegion] = useState({
@@ -20,6 +23,7 @@ export default function TrackMove() {
     const [elapsedTime, setElapsedTime] = useState(0); // Time tracking
     const [timer, setTimer] = useState(null); // Timer reference
     // State where location is saved
+    const [tracks, setTracks] = useState([]);
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
@@ -79,6 +83,19 @@ export default function TrackMove() {
         setIsTracking(false);
         clearInterval(timer);
         await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME); // Stop observing position updates
+        // Save completed track data to `tracks`
+        const newTrack = {
+            date: new Date().toLocaleDateString(),
+            duration: elapsedTime,
+            locations: locations,
+        };
+
+        try {
+            await addDoc(collection(db, 'tracks'), newTrack);
+            console.log("Track saved to Firebase");
+        } catch (error) {
+            console.error("Error saving track to Firebase:", error);
+        }
     };
 
     // Cleanup function
@@ -105,7 +122,7 @@ export default function TrackMove() {
                     title="Go to Track List"
                     onPress={() => {
                         console.log("Navigating to TrackList...");
-                        navigation.navigate('TrackList');
+                        navigation.navigate('TrackList', { tracks });
                     }}
                 />
             </View>

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, FlatList, ImageBackground } from 'react-native';
+import { View, StyleSheet, FlatList, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebaseConfig';
+import { PaperProvider } from 'react-native-paper';
+import { Button, TextInput, Text } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 
 const activities = [
     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km' },  // Example for yesterday
@@ -46,7 +49,7 @@ const HomeScreen = () => {
                     style={styles.activityList}
                 /> */}
 
-                <Button title="Start New Activity" onPress={() => navigation.navigate('Start')} />
+                <Button mode="contained" icon="play-circle-outline" onPress={() => navigation.navigate('Start')} >Start</Button>
                 {/* Logout Button */}
                 <Button title="Log Out" onPress={handleLogout} color="red" />
             </View>
