@@ -32,6 +32,14 @@ export default function TrackMove() {
                 Alert.alert('No permission to get location')
                 return;
             }
+            // Request background location permission
+            if (Platform.OS === 'android') {
+                let { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
+                if (bgStatus !== 'granted') {
+                    Alert.alert('No permission for background location');
+                    return;
+                }
+            }
             let location = await Location.getCurrentPositionAsync({});
             setCurrentLocation(location);
             const { latitude, longitude } = location.coords;
