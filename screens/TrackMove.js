@@ -4,6 +4,7 @@ import MyMap from '../components/MyMap';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
+import * as Location from 'expo-location';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -64,26 +65,39 @@ export default function TrackMove() {
             timeInterval: 1000, // Update every second
         });
 
-        // Listen for location updates
-        Location.startWatchPositionAsync(LOCATION_TASK_NAME, (newLocation) => {
-            const { latitude, longitude } = newLocation.coords;
-            // Log the new location coordinates
-            console.log(`New Location - Latitude: ${latitude}, Longitude: ${longitude}`);
-            setLocations((prevLocations) => [
-                ...prevLocations,
-                { latitude, longitude }
-            ]);
-            setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
-            setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
-        });
+        try {
+            await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+                accuracy: Location.Accuracy.High,
+                distanceInterval: 1,
+                timeInterval: 1000,
+            });
+
+            Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    distanceInterval: 1,
+                },
+                (newLocation) => {
+                    const { latitude, longitude } = newLocation.coords;
+                    console.log(`New Location - Latitude: ${latitude}, Longitude: ${longitude}`);
+                    setLocations((prevLocations) => [
+                        ...prevLocations,
+                        { latitude, longitude }
+                    ]);
+                    setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
+                    setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
+                }
+            );
+        } catch (error) {
+            console.error("Error starting location tracking:", error);
+        }
     };
 
-    // Stop tracking
     const stopTracking = async () => {
         setIsTracking(false);
         clearInterval(timer);
-        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME); // Stop observing position updates
-        // Save completed track data to `tracks`
+        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+
         const newTrack = {
             date: new Date().toLocaleDateString(),
             duration: elapsedTime,
@@ -91,18 +105,18 @@ export default function TrackMove() {
         };
 
         try {
-            await addDoc(collection(db, 'tracks'), newTrack);
-            console.log("Track saved to Firebase");
+            await push(ref(database, 'tracks/'), newTrack);
+            console.log("Track saved to Firebase Realtime Database");
         } catch (error) {
-            console.error("Error saving track to Firebase:", error);
+            console.error("Error saving track to Firebase Realtime Database:", error);
+            Alert.alert('Error', 'Could not save tracking data. Please try again.');
         }
     };
 
-    // Cleanup function
     useEffect(() => {
         return () => {
             if (isTracking) {
-                stopTracking(); // Ensure to stop tracking if component unmounts
+                stopTracking();
             }
         };
     }, [isTracking]);

@@ -7,6 +7,8 @@ export default function MyMap({ region, marker }) {
             style={styles.map}
             region={region}
             showsUserLocation={true}
+            followsUserLocation={true}  // Follow user location in iOS only
+            userLocationUpdateInterval={1000}  // Follow user location in Android only
         >
             {marker && (
                 <Marker
