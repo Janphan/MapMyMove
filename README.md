@@ -17,7 +17,7 @@ Designed for users who want to monitor their movement and schedule, the app offe
 
 Follow these steps to clone the repository and run the app on a mobile device.
 - git clone https://github.com/Janphan/MapMyMove.git
-- cd your-repository-name
+- cd MapMyMove
 - npm install
 - npx expo start
 - Install the Expo Go App on your mobile device
