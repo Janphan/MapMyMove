@@ -13,6 +13,17 @@ Designed for users who want to monitor their movement and schedule, the app offe
 
 **Settings Customization:** Allows users to configure their preferences within the app for a personalized experience.
 
+## Getting Started
+
+Follow these steps to clone the repository and run the app on a mobile device.
+- git clone https://github.com/Janphan/MapMyMove.git
+- cd your-repository-name
+- npm install
+- npx expo start
+- Install the Expo Go App on your mobile device
+- Open the App on Your Device:
+- Scan the QR code shown in your terminal or in the Expo DevTools in your browser with your mobile device's camera (for iOS) or Expo Go app (for Android).
+- The app should open in Expo Go, allowing you to test the application on your mobile device.
 ## Technology Stack
 ### Frontend:
 
