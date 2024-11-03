@@ -5,8 +5,19 @@ import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
 
 const LOCATION_TASK_NAME = 'background-location-task';
+TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+    if (error) {
+        console.error(error);
+        return;
+    }
+    if (data) {
+        const { locations } = data;
+        console.log("Received new locations", locations);
+    }
+});
 
 export default function TrackMove() {
     const db = getFirestore(app);
@@ -67,11 +78,11 @@ export default function TrackMove() {
         }, 1000));
 
         // Start location updates
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-            accuracy: Location.Accuracy.High,
-            distanceInterval: 1, // Update on movement
-            timeInterval: 1000, // Update every second
-        });
+        // await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        //     accuracy: Location.Accuracy.High,
+        //     distanceInterval: 1, // Update on movement
+        //     timeInterval: 1000, // Update every second
+        // });
 
         try {
             await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
@@ -113,7 +124,8 @@ export default function TrackMove() {
         };
 
         try {
-            await push(ref(database, 'tracks/'), newTrack);
+            // await push(ref(database, 'tracks/'), newTrack);
+            await addDoc(collection(db, 'tracks'), newTrack);
             console.log("Track saved to Firebase Realtime Database");
         } catch (error) {
             console.error("Error saving track to Firebase Realtime Database:", error);
