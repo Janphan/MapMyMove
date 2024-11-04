@@ -19,11 +19,19 @@ export default function TrackMove() {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [locations, setLocations] = useState([]); // Store the locations for the route
     const [isTracking, setIsTracking] = useState(false); // Track if we are currently tracking
-    const [elapsedTime, setElapsedTime] = useState(0); // Time tracking
+    const [elapsedTime, setElapsedTime] = useState(); // Time tracking
     const [timer, setTimer] = useState(null); // Timer reference
     // State where location is saved
     const [tracks, setTracks] = useState([]);
 
+    //format date
+    const formatDate = (date) => {
+        return new Intl.DateTimeFormat('en-GB', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+        }).format(date);
+    };
     // Start tracking
     const startTracking = async () => {
         setIsTracking(true);
@@ -61,22 +69,28 @@ export default function TrackMove() {
     // stop tracking
     const stopTracking = async () => {
         setIsTracking(false);
-        clearInterval(timer);
+        if (timer) {
+            clearInterval(timer);
+            setTimer(null);
+        }
 
         const newTrack = {
-            date: new Date().toLocaleDateString(),
+            date: formatDate(new Date()),
             duration: elapsedTime,
-            locations: locations,
+            locations,
         };
+        console.log("new track", newTrack)
 
         try {
             // await push(ref(database, 'tracks/'), newTrack);
             await addDoc(collection(db, 'tracks'), newTrack);
+            setTracks((prevTracks) => [...prevTracks, newTrack]);
             console.log("Track saved to Firebase Realtime Database");
         } catch (error) {
             console.error("Error saving track to Firebase Realtime Database:", error);
             Alert.alert('Error', 'Could not save tracking data. Please try again.');
         }
+        setElapsedTime(0); // Reset timer for next session
     };
 
     useEffect(() => {
