@@ -71,14 +71,14 @@ const styles = StyleSheet.create({
     overlay: {
         width: '90%',
         padding: 24,
-        backgroundColor: 'rgba(255, 255, 255, 0.85)', // Semi-transparent overlay
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
         borderRadius: 10,
         alignItems: 'center',
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#4B0082', // Dark purple for the title
+        color: '#4B0082',
         marginBottom: 20,
     },
     input: {
@@ -86,14 +86,14 @@ const styles = StyleSheet.create({
         padding: 12,
         marginVertical: 10,
         borderWidth: 1,
-        borderColor: '#D3BCE3', // Light purple for the input border
+        borderColor: '#D3BCE3',
         borderRadius: 8,
         backgroundColor: '#fff',
     },
     button: {
         width: '100%',
         paddingVertical: 12,
-        backgroundColor: '#6A0DAD', // Bold purple for the main button
+        backgroundColor: '#6A0DAD',
         borderRadius: 8,
         alignItems: 'center',
         marginTop: 15,
@@ -108,12 +108,12 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#6A0DAD', // Bold purple border for the outline button
+        borderColor: '#6A0DAD',
         alignItems: 'center',
         marginTop: 10,
     },
     buttonOutlineText: {
-        color: '#6A0DAD', // Bold purple text for the outline button
+        color: '#6A0DAD',
         fontSize: 16,
         fontWeight: '600',
     },

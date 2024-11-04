@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, ImageBackground } from 'react-native';
+import { View, StyleSheet, FlatList, ImageBackground, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebaseConfig';
-import { PaperProvider } from 'react-native-paper';
-import { Button, TextInput, Text } from 'react-native-paper';
-import { useTheme } from 'react-native-paper';
+import { PaperProvider, Button, Text } from 'react-native-paper';
+import { logout } from '../services/authService';
 
 const activities = [
     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km' },  // Example for yesterday
@@ -14,7 +13,7 @@ const activities = [
 const HomeScreen = () => {
     const navigation = useNavigation();
     const [yesterdaysActivities, setYesterdaysActivities] = useState([]);
-    // const username = auth.currentUser?.displayName || 'User';
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
@@ -24,49 +23,71 @@ const HomeScreen = () => {
         return () => unsubscribe();
     }, []);
 
-    const handleLogout = () => {
-        auth.signOut().then(() => {
-            console.log("User logged out");
-            navigation.navigate('AuthStack', { screen: 'Login' })
-        }).catch((error) => {
-            console.error("Error logging out:", error)
-        })
-    }
+    const handleLogout = async () => {
+        try {
+            await logout();  // Use the logout function here
+            Alert.alert('Logged Out', 'You have been logged out successfully.');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }], // Reset the stack and navigate to Login
+            });
+        } catch (error) {
+            Alert.alert('Logout Failed', 'An error occurred while logging out.');
+        }
+    };
+
+    const renderActivityItem = ({ item }) => (
+        <View style={styles.activityItem}>
+            <Text>{item.type}</Text>
+            <Text>Date: {item.date}</Text>
+            <Text>Distance: {item.distance}</Text>
+        </View>
+    );
+
     return (
-        <ImageBackground
-            source={{ uri: "https://img.goodfon.com/wallpaper/big/5/22/sneakers-outdoors-running-jogging.webp" }}
-            style={styles.background}
-        >
-            <View style={styles.container}>
-                {/* Greeting Message */}
-                <Text style={styles.greeting}>Welcome!</Text>
+        <PaperProvider>
+            <ImageBackground
+                source={{ uri: "https://img.goodfon.com/wallpaper/big/5/22/sneakers-outdoors-running-jogging.webp" }}
+                style={styles.background}
+            >
+                <View style={styles.container}>
+                    {/* Greeting Message */}
+                    <Text style={styles.greeting}>Welcome, {user?.displayName || 'User'}!</Text>
 
-                <Text style={styles.subtitle}>Yesterday's Activities</Text>
-                {/* <FlatList
-                    data={yesterdaysActivities}
-                    renderItem={renderActivityItem}
-                    keyExtractor={item => item.id}
-                    style={styles.activityList}
-                /> */}
+                    {/* Activities Section */}
+                    <Text style={styles.subtitle}>Yesterday's Activities</Text>
+                    <FlatList
+                        data={activities}
+                        renderItem={renderActivityItem}
+                        keyExtractor={(item) => item.id}
+                        style={styles.activityList}
+                    />
 
-                <Button mode="contained" icon="play-circle-outline" onPress={() => navigation.navigate('Start')} >Start</Button>
-                {/* Logout Button */}
-                <Button title="Log Out" onPress={handleLogout} color="red" />
-            </View>
-        </ImageBackground>
+                    {/* Start Button */}
+                    <Button mode="contained" icon="play-circle-outline" onPress={() => navigation.navigate('Start')} style={styles.startButton}>
+                        Start
+                    </Button>
+
+                    {/* Logout Button */}
+                    <Button mode="contained" onPress={handleLogout} color="red" style={styles.logoutButton}>
+                        Log Out
+                    </Button>
+                </View>
+            </ImageBackground>
+        </PaperProvider>
     );
 };
 
 const styles = StyleSheet.create({
     background: {
-        flex: 1, // Ensure background image covers the entire screen
-        justifyContent: 'center', // Center content
-        alignItems: 'center', // Align content to center
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: semi-transparent background for better text visibility
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
         borderRadius: 10,
         margin: 10,
     },
@@ -79,6 +100,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginTop: 20,
+        marginBottom: 10,
     },
     activityItem: {
         padding: 15,
@@ -87,6 +109,12 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     activityList: {
+        marginTop: 10,
+    },
+    startButton: {
+        marginVertical: 15,
+    },
+    logoutButton: {
         marginTop: 10,
     },
 });
