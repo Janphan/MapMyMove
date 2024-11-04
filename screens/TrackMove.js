@@ -5,19 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import * as Location from 'expo-location';
-import * as TaskManager from 'expo-task-manager';
-
-const LOCATION_TASK_NAME = 'background-location-task';
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-    if (error) {
-        console.error("Background task error:", error);
-        return;
-    }
-    if (data) {
-        const { locations } = data;
-        console.log("Received new locations:", locations);
-    }
-});
 
 export default function TrackMove() {
     const db = getFirestore(app);
@@ -47,56 +34,34 @@ export default function TrackMove() {
         }, 1000));
 
         try {
-            await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-                accuracy: Location.Accuracy.High,
-                distanceInterval: 1,
-                timeInterval: 1000
-            });
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permission not granted to access location');
+                return;
+            }
+            Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    distanceInterval: 1,
+                },
+                (newLocation) => {
+                    const { latitude, longitude } = newLocation.coords;
+                    setLocations((prevLocations) => [
+                        ...prevLocations,
+                        { latitude, longitude }
+                    ]);
+                    setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
+                    setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
+                }
+            );
         } catch (error) {
             console.error("Error starting location tracking:", error);
         }
-
-        Location.watchPositionAsync(
-            {
-                accuracy: Location.Accuracy.High,
-                distanceInterval: 1,
-            },
-            (newLocation) => {
-                const { latitude, longitude } = newLocation.coords;
-                setLocations((prevLocations) => [
-                    ...prevLocations,
-                    { latitude, longitude }
-                ]);
-                setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
-                setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
-            }
-        );
     };
-    useEffect(() => {
-        (async () => {
-            const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
-            if (foregroundStatus !== 'granted') {
-                Alert.alert('No permission to get location');
-                return;
-            }
-
-            const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-            if (backgroundStatus !== 'granted') {
-                Alert.alert('No permission for background location');
-                return;
-            }
-
-            const location = await Location.getCurrentPositionAsync({});
-            setCurrentLocation(location);
-            const { latitude, longitude } = location.coords;
-            setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
-            setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
-        })();
-    }, []);
+    // stop tracking
     const stopTracking = async () => {
         setIsTracking(false);
         clearInterval(timer);
-        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
 
         const newTrack = {
             date: new Date().toLocaleDateString(),
@@ -113,6 +78,21 @@ export default function TrackMove() {
             Alert.alert('Error', 'Could not save tracking data. Please try again.');
         }
     };
+
+    useEffect(() => {
+        (async () => {
+            const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+            if (foregroundStatus !== 'granted') {
+                Alert.alert('No permission to get location');
+                return;
+            }
+            const location = await Location.getCurrentPositionAsync({});
+            setCurrentLocation(location);
+            const { latitude, longitude } = location.coords;
+            setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
+            setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
+        })();
+    }, []);
 
     useEffect(() => {
         return () => {
