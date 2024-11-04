@@ -13,11 +13,9 @@
     },
     "ios": {
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app requires location access to track your movement.",
-        "NSLocationAlwaysUsageDescription": "This app requires background location access to track your movement even when the app is closed.",
         "UIBackgroundModes": [
           "location"
-        ]
+        ],
       },
       "supportsTablet": true
     },

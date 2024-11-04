@@ -125,7 +125,7 @@ export default function TrackMove() {
     return (
         <View style={styles.container}>
             <View style={styles.mapContainer}>
-                <MyMap region={region} marker={marker} />
+                <MyMap region={region} marker={marker} locations={locations} />
             </View>
             <View style={styles.buttonContainer}>
                 {isTracking ? (

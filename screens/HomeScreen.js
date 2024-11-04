@@ -14,7 +14,7 @@ const activities = [
 const HomeScreen = () => {
     const navigation = useNavigation();
     const [yesterdaysActivities, setYesterdaysActivities] = useState([]);
-    const username = auth.currentUser?.displayName || 'User';
+    // const username = auth.currentUser?.displayName || 'User';
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
@@ -39,7 +39,7 @@ const HomeScreen = () => {
         >
             <View style={styles.container}>
                 {/* Greeting Message */}
-                <Text style={styles.greeting}>Welcome, {username}!</Text>
+                <Text style={styles.greeting}>Welcome!</Text>
 
                 <Text style={styles.subtitle}>Yesterday's Activities</Text>
                 {/* <FlatList

@@ -1,7 +1,7 @@
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import { StyleSheet, View, Text } from 'react-native';
 import { useState } from 'react';
-export default function MyMap({ region, marker }) {
+export default function MyMap({ region, marker, locations }) {
     return (
         <MapView
             style={styles.map}
@@ -19,6 +19,14 @@ export default function MyMap({ region, marker }) {
                     }}
                     title={marker.title}
                     pinColor={marker.color}
+                />
+            )}
+            {/* Polyline for the path */}
+            {locations.length > 1 && (
+                <Polyline
+                    coordinates={locations}
+                    strokeColor="#3498db" // Customize the color of the polyline
+                    strokeWidth={4} // Customize the width of the polyline
                 />
             )}
         </MapView>
