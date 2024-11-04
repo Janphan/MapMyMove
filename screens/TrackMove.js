@@ -10,12 +10,12 @@ import * as TaskManager from 'expo-task-manager';
 const LOCATION_TASK_NAME = 'background-location-task';
 TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
     if (error) {
-        console.error(error);
+        console.error("Background task error:", error);
         return;
     }
     if (data) {
         const { locations } = data;
-        console.log("Received new locations", locations);
+        console.log("Received new locations:", locations);
     }
 });
 
@@ -36,82 +36,63 @@ export default function TrackMove() {
     const [timer, setTimer] = useState(null); // Timer reference
     // State where location is saved
     const [tracks, setTracks] = useState([]);
-    useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('No permission to get location')
-                return;
-            }
-            // Request background location permission
-            if (Platform.OS === 'android') {
-                let { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
-                if (bgStatus !== 'granted') {
-                    Alert.alert('No permission for background location');
-                    return;
-                }
-            }
-            let location = await Location.getCurrentPositionAsync({});
-            setCurrentLocation(location);
-            const { latitude, longitude } = location.coords;
-            setRegion({
-                latitude: latitude,
-                longitude: longitude,
-                latitudeDelta: 0.0322,
-                longitudeDelta: 0.0221,
-            });
-            setMarker({
-                latitude: latitude,
-                longitude: longitude,
-                title: 'Current Location',
-                color: '#3498db',
-            });
-        })();
-    }, []);
+
     // Start tracking
     const startTracking = async () => {
         setIsTracking(true);
         setElapsedTime(0);
-        setLocations([]); // Reset locations
+        setLocations([]);
         setTimer(setInterval(() => {
-            setElapsedTime((prevTime) => prevTime + 1); // Increment every second
+            setElapsedTime((prevTime) => prevTime + 1);
         }, 1000));
-
-        // Start location updates
-        // await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        //     accuracy: Location.Accuracy.High,
-        //     distanceInterval: 1, // Update on movement
-        //     timeInterval: 1000, // Update every second
-        // });
 
         try {
             await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
                 accuracy: Location.Accuracy.High,
                 distanceInterval: 1,
-                timeInterval: 1000,
+                timeInterval: 1000
             });
-
-            Location.watchPositionAsync(
-                {
-                    accuracy: Location.Accuracy.High,
-                    distanceInterval: 1,
-                },
-                (newLocation) => {
-                    const { latitude, longitude } = newLocation.coords;
-                    console.log(`New Location - Latitude: ${latitude}, Longitude: ${longitude}`);
-                    setLocations((prevLocations) => [
-                        ...prevLocations,
-                        { latitude, longitude }
-                    ]);
-                    setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
-                    setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
-                }
-            );
         } catch (error) {
             console.error("Error starting location tracking:", error);
         }
-    };
 
+        Location.watchPositionAsync(
+            {
+                accuracy: Location.Accuracy.High,
+                distanceInterval: 1,
+            },
+            (newLocation) => {
+                const { latitude, longitude } = newLocation.coords;
+                setLocations((prevLocations) => [
+                    ...prevLocations,
+                    { latitude, longitude }
+                ]);
+                setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
+                setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
+            }
+        );
+    };
+    useEffect(() => {
+        (async () => {
+            const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+            if (foregroundStatus !== 'granted') {
+                Alert.alert('No permission to get location');
+                return;
+            }
+
+            const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+            if (backgroundStatus !== 'granted') {
+                Alert.alert('No permission for background location');
+                return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({});
+            setCurrentLocation(location);
+            const { latitude, longitude } = location.coords;
+            setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
+            setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
+        })();
+    }, []);
     const stopTracking = async () => {
         setIsTracking(false);
         clearInterval(timer);
@@ -140,6 +121,7 @@ export default function TrackMove() {
             }
         };
     }, [isTracking]);
+
     return (
         <View style={styles.container}>
             <View style={styles.mapContainer}>

@@ -13,7 +13,6 @@ import { auth } from './firebaseConfig';
 import { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { PaperProvider } from 'react-native-paper';
-import customTheme from './customTheme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -80,7 +79,7 @@ export default function App() {
   if (initializing) return null;
 
   return (
-    <PaperProvider theme={customTheme}>
+    <PaperProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {user ? (
