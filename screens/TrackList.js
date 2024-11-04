@@ -66,4 +66,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    trackItem: {
+        flexDirection: 'row',       // Arrange text and button in a row
+        justifyContent: 'space-between', // Place button to the far right
+        alignItems: 'center',
+        padding: 10,
+        backgroundColor: '#f8f8f8',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+        width: '95%',              // Take up full width
+    },
+    trackText: {
+        fontSize: 16,
+        flex: 1,
+    },
 });
