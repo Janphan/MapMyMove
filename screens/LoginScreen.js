@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, Alert, StyleSheet } from 'react-native';
+import { View, TextInput, Button, Text, Alert, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
 import { login } from '../services/authService';
 
 // Helper function for email validation
-const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // Basic email validation regex
-    return emailRegex.test(email);
-};
+const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
@@ -14,65 +11,110 @@ export default function LoginScreen({ navigation }) {
 
     const handleLogin = async () => {
         if (!validateEmail(email)) {
-            Alert.alert('Error', 'Please enter a valid email address.');
+            Alert.alert('Invalid Email', 'Please enter a valid email address.');
             return;
         }
         if (password.length < 6) {
-            Alert.alert('Error', 'Password must be at least 6 characters.');
+            Alert.alert('Password Too Short', 'Password must be at least 6 characters.');
             return;
         }
         try {
-            await login(email, password);  // Call the login function from authService
+            await login(email, password);
             Alert.alert('Success', 'Logged in successfully!');
-            navigation.navigate('AppTabs', { screen: 'Home' });  // Navigate to the Home screen after successful login
+            navigation.navigate('AppTabs', { screen: 'Home' });
         } catch (error) {
-            Alert.alert('Error', `Error logging in: ${error.message}`);  // Show an error message if something goes wrong
+            Alert.alert('Login Failed', error.message || 'An error occurred during login.');
         }
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
-            <Button title="Log In" onPress={handleLogin} />
-            <Button title="Sign Up" onPress={() => navigation.navigate('Signup')} />
-        </View>
+        <ImageBackground
+            source={{ uri: "https://astym.com/wp-content/uploads/2014/11/runner-1-scaled.jpg" }}
+            style={styles.background}
+        >
+            <View style={styles.overlay}>
+                <Text style={styles.title}>Login</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    placeholderTextColor="#aaa"
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    placeholderTextColor="#aaa"
+                />
+                <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                    <Text style={styles.buttonText}>Log In</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Signup')}>
+                    <Text style={styles.buttonOutlineText}>Sign Up</Text>
+                </TouchableOpacity>
+            </View>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    background: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#f5f5f5'
+    },
+    overlay: {
+        width: '90%',
+        padding: 24,
+        backgroundColor: 'rgba(255, 255, 255, 0.85)', // Semi-transparent overlay
+        borderRadius: 10,
+        alignItems: 'center',
     },
     title: {
-        fontSize: 24,
-        marginBottom: 24,
+        fontSize: 28,
         fontWeight: 'bold',
+        color: '#4B0082', // Dark purple for the title
+        marginBottom: 20,
     },
     input: {
         width: '100%',
-        padding: 10,
-        marginVertical: 8,
+        padding: 12,
+        marginVertical: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+        borderColor: '#D3BCE3', // Light purple for the input border
+        borderRadius: 8,
+        backgroundColor: '#fff',
+    },
+    button: {
+        width: '100%',
+        paddingVertical: 12,
+        backgroundColor: '#6A0DAD', // Bold purple for the main button
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 15,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    buttonOutline: {
+        width: '100%',
+        paddingVertical: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#6A0DAD', // Bold purple border for the outline button
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    buttonOutlineText: {
+        color: '#6A0DAD', // Bold purple text for the outline button
+        fontSize: 16,
+        fontWeight: '600',
     },
 });
