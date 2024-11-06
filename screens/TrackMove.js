@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, Button, Alert } from 'react-native';
+import { StyleSheet, View, Alert, Keyboard } from 'react-native';
+import { Button, Text, PaperProvider, TextInput } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import MyMap from '../components/MyMap';
 import { useNavigation } from '@react-navigation/native';
@@ -15,14 +16,12 @@ export default function TrackMove() {
         longitude: 24.934302,
         latitudeDelta: 0.0322,
         longitudeDelta: 0.0221,
-    })
+    });
     const [currentLocation, setCurrentLocation] = useState(null);
     const [locations, setLocations] = useState([]); // Store the locations for the route
     const [isTracking, setIsTracking] = useState(false); // Track if we are currently tracking
-    const [elapsedTime, setElapsedTime] = useState(); // Time tracking
-    const [timer, setTimer] = useState(null); // Timer reference
-    // State where location is saved
-    const [tracks, setTracks] = useState([]);
+    const [elapsedTime, setElapsedTime] = useState(0);
+    const [timer, setTimer] = useState(null);
 
     //format date
     const formatDate = (date) => {
@@ -32,10 +31,10 @@ export default function TrackMove() {
             day: '2-digit',
         }).format(date);
     };
+
     // Start tracking
     const startTracking = async () => {
         setIsTracking(true);
-        setElapsedTime(0);
         setLocations([]);
         setTimer(setInterval(() => {
             setElapsedTime((prevTime) => prevTime + 1);
@@ -66,7 +65,8 @@ export default function TrackMove() {
             console.error("Error starting location tracking:", error);
         }
     };
-    // stop tracking
+
+    // Stop tracking
     const stopTracking = async () => {
         setIsTracking(false);
         if (timer) {
@@ -82,12 +82,10 @@ export default function TrackMove() {
         console.log("new track", newTrack)
 
         try {
-            // await push(ref(database, 'tracks/'), newTrack);
             await addDoc(collection(db, 'tracks'), newTrack);
-            setTracks((prevTracks) => [...prevTracks, newTrack]);
-            console.log("Track saved to Firebase Realtime Database");
+            console.log("Track saved to Firebase Firestore");
         } catch (error) {
-            console.error("Error saving track to Firebase Realtime Database:", error);
+            console.error("Error saving track:", error);
             Alert.alert('Error', 'Could not save tracking data. Please try again.');
         }
         setElapsedTime(0); // Reset timer for next session
@@ -108,36 +106,24 @@ export default function TrackMove() {
         })();
     }, []);
 
-    useEffect(() => {
-        return () => {
-            if (isTracking) {
-                stopTracking();
-            }
-        };
-    }, [isTracking]);
-
     return (
-        <View style={styles.container}>
-            <View style={styles.mapContainer}>
-                <MyMap region={region} marker={marker} locations={locations} />
-            </View>
-            <View style={styles.buttonContainer}>
-                {isTracking ? (
-                    <Button title="Stop Tracking" onPress={stopTracking} />
-                ) : (
-                    <Button title="Start Tracking" onPress={startTracking} />
-                )}
-                <Text style={styles.timerText}>Time: {elapsedTime}s</Text>
-                <Button
-                    title="Go to Track List"
-                    onPress={() => {
-                        console.log("Navigating to TrackList...");
-                        navigation.navigate('TrackList', { tracks });
-                    }}
-                />
-            </View>
-        </View>
+        <PaperProvider>
+            <View style={styles.container}>
+                <View style={styles.mapContainer}>
+                    <MyMap region={region} marker={marker} locations={locations} />
+                    <Text style={styles.elapsedTimeText}>Elapsed Time: {elapsedTime}s</Text>
+                </View>
 
+                <View style={styles.buttonContainer}>
+                    <Button mode="contained" onPress={isTracking ? stopTracking : startTracking} style={styles.mainButton}>
+                        {isTracking ? 'Stop Tracking' : 'Start Tracking'}
+                    </Button>
+                    <Button mode="contained" onPress={() => navigation.navigate('TrackList')} style={styles.secondaryButton}>
+                        Go to Track List
+                    </Button>
+                </View>
+            </View>
+        </PaperProvider>
     );
 }
 
@@ -147,18 +133,30 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     mapContainer: {
-        flex: 8,  // 80% of the screen height
+        flex: 8, // 80% of the screen height
         width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     buttonContainer: {
-        flex: 1,  // 20% of the screen height
-        justifyContent: 'center',  // Center contents vertically
-        alignItems: 'center',  // Center contents horizontally
-        padding: 20,  // Add some padding
+        flex: 1, // 20% of the screen height
+        justifyContent: 'center', // Center contents vertically
+        alignItems: 'center', // Center contents horizontally
+        padding: 20, // Add some padding
     },
-    timerText: {
-        fontSize: 15,
+    mainButton: {
+        width: '75%',
+        marginTop: 10,
+    },
+    secondaryButton: {
+        width: '75%',
+        marginTop: 10,
+    },
+    elapsedTimeText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
         marginVertical: 10,
-        alignSelf: 'center',
+        textAlign: 'center',
     },
 });
