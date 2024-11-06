@@ -6,8 +6,8 @@ import { PaperProvider, Button, Text } from 'react-native-paper';
 import { logout } from '../services/authService';
 
 const activities = [
-    { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km' },  // Example for yesterday
-    { id: '2', type: 'Walk', date: '2024-10-25', distance: '3 km' },  // Example for the day before
+    { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km', duration: "1 hour" },  // Example for yesterday
+    { id: '2', type: 'Walk', date: '2024-10-25', distance: '3 km', duration: "45 minutes" },  // Example for the day before
 ];
 
 const HomeScreen = () => {
@@ -41,6 +41,7 @@ const HomeScreen = () => {
             <Text>{item.type}</Text>
             <Text>Date: {item.date}</Text>
             <Text>Distance: {item.distance}</Text>
+            <Text>Duration: {item.duration}</Text>
         </View>
     );
 
@@ -52,7 +53,7 @@ const HomeScreen = () => {
             >
                 <View style={styles.container}>
                     {/* Greeting Message */}
-                    <Text style={styles.greeting}>Welcome, {user?.displayName || 'User'}!</Text>
+                    <Text style={styles.greeting}>Welcome!</Text>
 
                     {/* Activities Section */}
                     <Text style={styles.subtitle}>Yesterday's Activities</Text>

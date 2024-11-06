@@ -6,6 +6,7 @@ export default function SettingScreen() {
     return (
         <View style={styles.container}>
             {/* Account Settings */}
+            <Text variant="titleLarge" style={styles.sectionTitle}>(Under development)</Text>
             <Text variant="titleLarge" style={styles.sectionTitle}>Account</Text>
             <View style={styles.buttonContainer}>
                 <Button

@@ -57,6 +57,23 @@ function AppTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;   //it returns an icon component
         },
+        // Customize active/inactive color and label style
+        tabBarActiveTintColor: '#2c3e50',  // Active color
+        tabBarInactiveTintColor: '#95a5a6', // Inactive color
+        tabBarStyle: {
+          backgroundColor: '#E6E6FA',
+          paddingBottom: 8,
+          height: 55,
+          shadowColor: '#000',
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          borderTopWidth: 0,
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '500',
+          paddingBottom: 5,
+        },
       })}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Start" component={TrackStack} options={{ title: 'Track' }} />

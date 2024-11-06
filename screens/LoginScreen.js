@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, Alert, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Alert, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { TextInput, Button, Text, PaperProvider } from 'react-native-paper';
 import { login } from '../services/authService';
 
 // Helper function for email validation
@@ -28,37 +29,39 @@ export default function LoginScreen({ navigation }) {
     };
 
     return (
-        <ImageBackground
-            source={{ uri: "https://astym.com/wp-content/uploads/2014/11/runner-1-scaled.jpg" }}
-            style={styles.background}
-        >
-            <View style={styles.overlay}>
-                <Text style={styles.title}>Login</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    placeholderTextColor="#aaa"
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    placeholderTextColor="#aaa"
-                />
-                <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                    <Text style={styles.buttonText}>Log In</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Signup')}>
-                    <Text style={styles.buttonOutlineText}>Sign Up</Text>
-                </TouchableOpacity>
-            </View>
-        </ImageBackground>
+        <PaperProvider>
+            <ImageBackground
+                source={{ uri: "https://astym.com/wp-content/uploads/2014/11/runner-1-scaled.jpg" }}
+                style={styles.background}
+            >
+                <View style={styles.overlay}>
+                    <Text style={styles.title}>Login</Text>
+                    <TextInput
+                        label="Email"
+                        mode="outlined"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        style={styles.input}
+                    />
+                    <TextInput
+                        label="Password"
+                        mode="outlined"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                        style={styles.input}
+                    />
+                    <Button mode="contained" onPress={handleLogin} style={styles.button}>
+                        Log In
+                    </Button>
+                    <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Signup')}>
+                        <Text style={styles.buttonOutlineText}>Don't have an account? Sign Up</Text>
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
+        </PaperProvider>
     );
 }
 
@@ -83,19 +86,13 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        padding: 12,
-        marginVertical: 10,
-        borderWidth: 1,
-        borderColor: '#D3BCE3',
-        borderRadius: 8,
-        backgroundColor: '#fff',
+        marginVertical: 8,
     },
     button: {
         width: '100%',
         paddingVertical: 12,
         backgroundColor: '#6A0DAD',
         borderRadius: 8,
-        alignItems: 'center',
         marginTop: 15,
     },
     buttonText: {
