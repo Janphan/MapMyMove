@@ -9,21 +9,22 @@ export default function SignupScreen({ navigation }) {
     const [password, setPassword] = useState('');
 
     const handleSignup = async () => {
+        if (!email || !password) {
+            Alert.alert('Error', 'Please fill in both fields.');
+            return;
+        }
         try {
             const userCredential = await signUp(email, password);
-            const user = userCredential.user;
-            console.log("New user object:", user);
-            if (user) {
-                Alert.alert('Success', 'Account created successfully!');
-                navigation.navigate('AuthStack', { screen: 'Login' });
-            } else {
-                console.error("User creation failed. User object is null.");
-            }
+            console.log("User Credential:", userCredential);
+            // The user is always inside the userCredential.user
+            Alert.alert('Success', 'Account created successfully!');
+            navigation.navigate('Login');
         } catch (error) {
-            console.error("Signup error:", error.message);
             Alert.alert('Error', error.message);
         }
     };
+
+
 
     return (
         <PaperProvider>
