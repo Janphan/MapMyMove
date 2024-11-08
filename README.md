@@ -12,6 +12,12 @@ Designed for users who want to monitor their movement and schedule, the app offe
 **Tab Navigation:** Easy access to different sections of the app, including Home, Start, Calendar, and Settings, with customizable icons.
 
 **Settings Customization:** Allows users to configure their preferences within the app for a personalized experience.
+<p align="center">
+  <img src="./demo/Login.jpg" alt="Login" width="22%" />
+  <img src="./demo/home.jpg" alt="Homepage" width="22%" />
+  <img src="./demo/trackmove.jpg" alt="Trackmove" width="22%" />
+  <img src="./demo/tracklist.jpg" alt="Tracklist" width="22%" />
+</p>
 
 ## Getting Started
 
