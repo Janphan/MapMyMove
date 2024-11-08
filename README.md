@@ -3,6 +3,7 @@ MapMyMove is a mobile application that allows users to track their physical move
 Designed for users who want to monitor their movement and schedule, the app offers a seamless experience with user authentication, an interactive calendar, and intuitive navigation.
 
 ## Features
+
 **User Authentication**: Secure user registration and login functionality with Firebase Authentication.
 
 **Movement Tracking:** Track daily movements with easy logging, so users can monitor their activity levels.
@@ -34,6 +35,7 @@ Follow these steps to clone the repository and run the app on a mobile device.
 ### Frontend:
 
 **React Native:** Cross-platform mobile app development for iOS and Android.
+
 **React Navigation:** Handles stack and tab navigation for an intuitive user experience.
 ### Backend:
 
@@ -44,8 +46,11 @@ Follow these steps to clone the repository and run the app on a mobile device.
 ### UI and Icons:
 
 **React Native Components and Styling:** Custom components and styles for a user-friendly interface.
+
 ## App Structure
+
 ### Main App Navigation:
+
 **AuthStack:** Manages login and signup screens.
 
 **AppTabs:** The main app tab navigation includes screens for Home, Start (tracking movements), Calendar, and Settings.
