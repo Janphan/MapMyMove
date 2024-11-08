@@ -7,6 +7,7 @@ export default function CalendarComponent() {
     const [selectedDate, setSelectedDate] = useState('');
     return (
         <View style={styles.container}>
+            <Text variant="titleLarge" style={styles.sectionTitle}>(Under development)</Text>
             <Text style={styles.header}>Select a Date</Text>
             {/* Card wrapper for calendar */}
             <Card style={styles.card}>
