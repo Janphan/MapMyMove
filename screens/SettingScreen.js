@@ -1,13 +1,19 @@
+import React, { useContext } from 'react';
 import { StyleSheet, View, Switch } from 'react-native';
 import { Button, Text, Divider } from 'react-native-paper';
-import React from 'react';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function SettingScreen() {
+    const { isDarkMode, setIsDarkMode } = useContext(ThemeContext);
+
+    // Dynamically set styles based on dark mode
+    const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             {/* Account Settings */}
-            <Text variant="titleLarge" style={styles.sectionTitle}>(Under development)</Text>
-            <Text variant="titleLarge" style={styles.sectionTitle}>Account</Text>
+            <Text variant="titleLarge" style={[styles.sectionTitle, dynamicStyles.text]}>(Under development)</Text>
+            <Text variant="titleLarge" style={[styles.sectionTitle, dynamicStyles.text]}>Account</Text>
             <View style={styles.buttonContainer}>
                 <Button
                     mode="contained"
@@ -25,30 +31,30 @@ export default function SettingScreen() {
                 </Button>
             </View>
 
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, dynamicStyles.divider]} />
 
             {/* Notification Settings */}
-            <Text variant="titleLarge" style={styles.sectionTitle}>Notifications</Text>
+            <Text variant="titleLarge" style={[styles.sectionTitle, dynamicStyles.text]}>Notifications</Text>
             <View style={styles.settingItem}>
-                <Text style={styles.settingText}>Activity Reminders</Text>
+                <Text style={[styles.settingText, dynamicStyles.text]}>Activity Reminders</Text>
                 <Switch value={true} onValueChange={() => { }} />
             </View>
             <View style={styles.settingItem}>
-                <Text style={styles.settingText}>Push Notifications</Text>
+                <Text style={[styles.settingText, dynamicStyles.text]}>Push Notifications</Text>
                 <Switch value={true} onValueChange={() => { }} />
             </View>
 
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, dynamicStyles.divider]} />
 
             {/* Theme and Display */}
-            <Text variant="titleLarge" style={styles.sectionTitle}>Display</Text>
-            <Button
-                mode="contained"
-                onPress={() => { /* Toggle Dark Mode */ }}
-                style={styles.button}
-            >
-                Dark Mode
-            </Button>
+            <Text variant="titleLarge" style={[styles.sectionTitle, dynamicStyles.text]}>Display</Text>
+            <View style={styles.settingItem}>
+                <Text style={[styles.settingText, dynamicStyles.text]}>Dark Mode</Text>
+                <Switch
+                    value={isDarkMode}
+                    onValueChange={() => setIsDarkMode(!isDarkMode)}
+                />
+            </View>
         </View>
     );
 }
@@ -56,7 +62,6 @@ export default function SettingScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
         alignItems: 'center',
         padding: 20,
     },
@@ -91,5 +96,29 @@ const styles = StyleSheet.create({
     divider: {
         width: '100%',
         marginVertical: 15,
+    },
+});
+
+const lightStyles = StyleSheet.create({
+    container: {
+        backgroundColor: '#fff',
+    },
+    text: {
+        color: '#000',
+    },
+    divider: {
+        backgroundColor: '#ccc',
+    },
+});
+
+const darkStyles = StyleSheet.create({
+    container: {
+        backgroundColor: '#121212',
+    },
+    text: {
+        color: '#fff',
+    },
+    divider: {
+        backgroundColor: '#444',
     },
 });

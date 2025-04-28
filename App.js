@@ -10,9 +10,10 @@ import TrackList from './screens/TrackList';
 import SignupScreen from './screens/SignupScreen';
 import LoginScreen from './screens/LoginScreen';
 import { auth } from './firebaseConfig';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { PaperProvider } from 'react-native-paper';
+import { DefaultTheme, DarkTheme, Provider as PaperProvider } from 'react-native-paper';
+import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -83,6 +84,16 @@ function AppTabs() {
   );
 }
 export default function App() {
+  return (
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
+  );
+}
+
+function MainApp() {
+  const { isDarkMode } = useContext(ThemeContext); // Access dark mode state
+  const theme = isDarkMode ? DarkTheme : DefaultTheme; // Dynamically set theme
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);
   useEffect(() => {
@@ -96,8 +107,8 @@ export default function App() {
   if (initializing) return null;
 
   return (
-    <PaperProvider>
-      <NavigationContainer>
+    <PaperProvider theme={theme}>
+      <NavigationContainer theme={theme}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {user ? (
             <Stack.Screen name="AppTabs" component={AppTabs} />
