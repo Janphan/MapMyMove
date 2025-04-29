@@ -1,11 +1,12 @@
 import { StyleSheet, View, Alert, Keyboard } from 'react-native';
 import { Button, Text, PaperProvider, TextInput } from 'react-native-paper';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import MyMap from '../components/MyMap';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import * as Location from 'expo-location';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function TrackMove() {
     const db = getFirestore(app);
@@ -22,6 +23,8 @@ export default function TrackMove() {
     const [isTracking, setIsTracking] = useState(false); // Track if we are currently tracking
     const [elapsedTime, setElapsedTime] = useState(0);
     const [timer, setTimer] = useState(null);
+    const { isDarkMode } = useContext(ThemeContext);
+    const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
 
     //format date
     const formatDate = (date) => {
@@ -108,7 +111,7 @@ export default function TrackMove() {
 
     return (
         <PaperProvider>
-            <View style={styles.container}>
+            <View style={[styles.container, dynamicStyles.container]}>
                 <View style={styles.mapContainer}>
                     <MyMap region={region} marker={marker} locations={locations} />
                     <Text style={styles.elapsedTimeText}>Elapsed Time: {elapsedTime}s</Text>
@@ -159,4 +162,14 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         textAlign: 'center',
     },
+});
+
+const lightStyles = StyleSheet.create({
+    container: { backgroundColor: '#fff' },
+    text: { color: '#000' },
+});
+
+const darkStyles = StyleSheet.create({
+    container: { backgroundColor: '#121212' },
+    text: { color: '#fff' },
 });

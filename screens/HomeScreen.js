@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, StyleSheet, FlatList, ImageBackground, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebaseConfig';
 import { PaperProvider, Button, Text } from 'react-native-paper';
 import { logout } from '../services/authService';
+import { ThemeContext } from '../context/ThemeContext';
 
 const activities = [
     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km', duration: "1 hour" },  // Example for yesterday
@@ -12,6 +13,8 @@ const activities = [
 
 const HomeScreen = () => {
     const navigation = useNavigation();
+    const { isDarkMode } = useContext(ThemeContext); // Access dark mode state
+    const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
     const [yesterdaysActivities, setYesterdaysActivities] = useState([]);
     const [user, setUser] = useState(null);
 
@@ -37,11 +40,11 @@ const HomeScreen = () => {
     };
 
     const renderActivityItem = ({ item }) => (
-        <View style={styles.activityItem}>
-            <Text>{item.type}</Text>
-            <Text>Date: {item.date}</Text>
-            <Text>Distance: {item.distance}</Text>
-            <Text>Duration: {item.duration}</Text>
+        <View style={[styles.activityItem, dynamicStyles.activityItem]}>
+            <Text style={dynamicStyles.text}>{item.type}</Text>
+            <Text style={dynamicStyles.text}>Date: {item.date}</Text>
+            <Text style={dynamicStyles.text}>Distance: {item.distance}</Text>
+            <Text style={dynamicStyles.text}>Duration: {item.duration}</Text>
         </View>
     );
 
@@ -49,14 +52,14 @@ const HomeScreen = () => {
         <PaperProvider>
             <ImageBackground
                 source={{ uri: "https://img.goodfon.com/wallpaper/big/5/22/sneakers-outdoors-running-jogging.webp" }}
-                style={styles.background}
+                style={[styles.background, dynamicStyles.background]}
             >
-                <View style={styles.container}>
+                <View style={[styles.container, dynamicStyles.container]}>
                     {/* Greeting Message */}
-                    <Text style={styles.greeting}>Welcome!</Text>
+                    <Text style={[styles.greeting, dynamicStyles.text]}>Welcome!</Text>
 
                     {/* Activities Section */}
-                    <Text style={styles.subtitle}>Yesterday's Activities</Text>
+                    <Text style={[styles.subtitle, dynamicStyles.text]}>Yesterday's Activities</Text>
                     <FlatList
                         data={activities}
                         renderItem={renderActivityItem}
@@ -117,6 +120,30 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         marginTop: 10,
+    },
+});
+
+const lightStyles = StyleSheet.create({
+    container: {
+        backgroundColor: '#fff',
+    },
+    text: {
+        color: '#000',
+    },
+    background: {
+        opacity: 1,
+    },
+});
+
+const darkStyles = StyleSheet.create({
+    container: {
+        backgroundColor: '#121212',
+    },
+    text: {
+        color: '#fff',
+    },
+    background: {
+        opacity: 0.8,
     },
 });
 

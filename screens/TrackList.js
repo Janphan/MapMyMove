@@ -1,9 +1,10 @@
 import { StyleSheet, View, FlatList, Alert, Keyboard } from 'react-native';
 import { Button, Text, PaperProvider, TextInput } from 'react-native-paper';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function TrackList() {
     const navigation = useNavigation();
@@ -12,6 +13,8 @@ export default function TrackList() {
     const [filterDate, setFilterDate] = useState('');
     const [filterDuration, setFilterDuration] = useState('');
     const db = getFirestore(app);
+    const { isDarkMode } = useContext(ThemeContext);
+    const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
 
     useEffect(() => {
         const tracksRef = collection(db, 'tracks');
@@ -54,7 +57,7 @@ export default function TrackList() {
 
     return (
         <PaperProvider>
-            <View style={styles.filterContainer}>
+            <View style={[styles.filterContainer, dynamicStyles.container]}>
                 {/* Filter Inputs in Row */}
                 <TextInput
                     label="Filter by Date"
@@ -78,17 +81,17 @@ export default function TrackList() {
                 Apply Filter
             </Button>
 
-            <View style={styles.container}>
+            <View style={[styles.container, dynamicStyles.container]}>
                 {/* Track List */}
                 {filteredTracks.length === 0 ? (
-                    <Text style={styles.noTracksText}>No tracks found</Text>
+                    <Text style={[styles.noTracksText, dynamicStyles.text]}>No tracks found</Text>
                 ) : (
                     <FlatList
                         data={filteredTracks}
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
                             <View style={styles.trackItem}>
-                                <Text style={styles.trackText}>{item.date} - Duration: {item.duration}s</Text>
+                                <Text style={[styles.trackText, dynamicStyles.text]}>{item.date} - Duration: {item.duration}s</Text>
                                 <Button
                                     mode="contained"
                                     color="red"
@@ -176,4 +179,14 @@ const styles = StyleSheet.create({
         color: '#555',
         textAlign: 'center',
     },
+});
+
+const lightStyles = StyleSheet.create({
+    container: { backgroundColor: '#fff' },
+    text: { color: '#000' },
+});
+
+const darkStyles = StyleSheet.create({
+    container: { backgroundColor: '#121212' },
+    text: { color: '#fff' },
 });

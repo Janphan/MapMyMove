@@ -1,14 +1,18 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Calendar } from 'react-native-calendars';
 import { Button, Card } from 'react-native-paper';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function CalendarComponent() {
     const [selectedDate, setSelectedDate] = useState('');
+    const { isDarkMode } = useContext(ThemeContext);
+    const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
+
     return (
-        <View style={styles.container}>
-            <Text variant="titleLarge" style={styles.sectionTitle}>(Under development)</Text>
-            <Text style={styles.header}>Select a Date</Text>
+        <View style={[styles.container, dynamicStyles.container]}>
+            <Text variant="titleLarge" style={[styles.sectionTitle, dynamicStyles.text]}>(Under development)</Text>
+            <Text style={[styles.header, dynamicStyles.text]}>Select a Date</Text>
             {/* Card wrapper for calendar */}
             <Card style={styles.card}>
                 <Card.Content>
@@ -27,9 +31,9 @@ export default function CalendarComponent() {
             </Card>
             {/* Display the selected date */}
             {selectedDate ? (
-                <Text style={styles.selectedText}>Selected Date: {selectedDate}</Text>
+                <Text style={[styles.selectedText, dynamicStyles.text]}>Selected Date: {selectedDate}</Text>
             ) : (
-                <Text style={styles.selectedText}>No date selected</Text>
+                <Text style={[styles.selectedText, dynamicStyles.text]}>No date selected</Text>
             )}
 
             {/* Button to reset the selected date */}
@@ -67,5 +71,23 @@ const styles = StyleSheet.create({
     resetButton: {
         marginTop: 20,
         width: '80%',
+    },
+});
+
+const darkStyles = StyleSheet.create({
+    container: {
+        backgroundColor: '#333',
+    },
+    text: {
+        color: '#fff',
+    },
+});
+
+const lightStyles = StyleSheet.create({
+    container: {
+        backgroundColor: '#fff',
+    },
+    text: {
+        color: '#000',
     },
 });
