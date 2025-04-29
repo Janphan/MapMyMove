@@ -21,16 +21,16 @@ const Stack = createNativeStackNavigator();
 function AuthStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
 function TrackStack() {
   return (
     <Stack.Navigator initialRouteName="TrackMove">
-      <Stack.Screen name="TrackMove" component={TrackMove} options={{ title: 'Track Move' }} />
-      <Stack.Screen name="TrackList" component={TrackList} options={{ title: 'Track List' }} />
+      <Stack.Screen name="TrackMove" component={TrackMove} options={{ title: 'Track Move', headerShown: false }} />
+      <Stack.Screen name="TrackList" component={TrackList} options={{ title: 'Track List', headerShown: false }} />
     </Stack.Navigator>
   );
 }
@@ -76,10 +76,10 @@ function AppTabs() {
           paddingBottom: 5,
         },
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Start" component={TrackStack} options={{ title: 'Track' }} />
-      <Tab.Screen name="Calendar" component={CalendarComponent} />
-      <Tab.Screen name="Settings" component={SettingScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="Start" component={TrackStack} options={{ title: 'Track', headerShown: false }} />
+      <Tab.Screen name="Calendar" component={CalendarComponent} options={{ headerShown: false }} />
+      <Tab.Screen name="Settings" component={SettingScreen} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 }

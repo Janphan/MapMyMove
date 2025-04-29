@@ -87,6 +87,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: 50,
+        resizeMode: 'cover',    // Cover the entire screen  
     },
     container: {
         flex: 1,
@@ -94,6 +96,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
         borderRadius: 10,
         margin: 10,
+        paddingTop: 50,
+        paddingBottom: 50,
     },
     greeting: {
         fontSize: 24,

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Alert, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Alert, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import { TextInput, Button, Text, PaperProvider } from 'react-native-paper';
 import { login } from '../services/authService';
+import logo2 from '../assets/logo2.jpg';
 
 // Helper function for email validation
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -31,10 +32,14 @@ export default function LoginScreen({ navigation }) {
     return (
         <PaperProvider>
             <ImageBackground
-                source={{ uri: "https://astym.com/wp-content/uploads/2014/11/runner-1-scaled.jpg" }}
+                source={{ uri: "https://shorturl.at/YxAR0" }}
                 style={styles.background}
             >
                 <View style={styles.overlay}>
+                    <Image
+                        source={logo2}
+                        style={styles.logo}
+                    />
                     <Text style={styles.title}>Login</Text>
                     <TextInput
                         label="Email"
@@ -78,6 +83,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
     },
+    logo: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        position: 'absolute',
+        top: 20,
+        left: 20,
+    },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -87,13 +100,17 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         marginVertical: 8,
+        borderRadius: 8, // Rounded corners
+        backgroundColor: '#f9f9f9', // Light background
+        elevation: 2, // Add shadow
     },
     button: {
         width: '100%',
         paddingVertical: 12,
         backgroundColor: '#6A0DAD',
-        borderRadius: 8,
+        borderRadius: 25,
         marginTop: 15,
+        elevation: 3,
     },
     buttonText: {
         color: '#fff',
