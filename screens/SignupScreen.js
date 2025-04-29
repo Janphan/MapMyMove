@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Alert, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Alert, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import { TextInput, Button, Text, PaperProvider } from 'react-native-paper';
 import { signUp } from '../services/authService'; // Assuming signUp function handles Firebase signup
 import { auth } from '../firebaseConfig'; // Firebase config
+import logo2 from '../assets/logo2.jpg';
 
 export default function SignupScreen({ navigation }) {
     const [email, setEmail] = useState('');
@@ -29,10 +30,14 @@ export default function SignupScreen({ navigation }) {
     return (
         <PaperProvider>
             <ImageBackground
-                source={{ uri: "https://astym.com/wp-content/uploads/2014/11/runner-1-scaled.jpg" }} // Set your background image URL
+                source={{ uri: "https://shorturl.at/YxAR0" }}
                 style={styles.background}
             >
                 <View style={styles.overlay}>
+                    <Image
+                        source={logo2}
+                        style={styles.logo}
+                    />
                     <Text style={styles.title}>Sign Up</Text>
                     <TextInput
                         label="Email"
@@ -76,22 +81,34 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
     },
+    logo: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        position: 'absolute',
+        top: 20,
+        left: 20,
+    },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#4B0082', // You can adjust the color to match your theme
+        color: '#4B0082',
         marginBottom: 20,
     },
     input: {
         width: '100%',
         marginVertical: 8,
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
+        elevation: 2,
     },
     button: {
         width: '100%',
         paddingVertical: 12,
         backgroundColor: '#6A0DAD',
-        borderRadius: 8,
+        borderRadius: 25,
         marginTop: 15,
+        elevation: 3,
     },
     buttonText: {
         color: '#fff',
