@@ -114,7 +114,9 @@ export default function TrackMove() {
             <View style={[styles.container, dynamicStyles.container]}>
                 <View style={styles.mapContainer}>
                     <MyMap region={region} marker={marker} locations={locations} />
-                    <Text style={styles.elapsedTimeText}>Elapsed Time: {elapsedTime}s</Text>
+                    <Text style={[styles.elapsedTimeText, dynamicStyles.elapsedTimeText]}>
+                        Elapsed Time: {elapsedTime}s
+                    </Text>
                 </View>
 
                 <View style={styles.buttonContainer}>
@@ -172,4 +174,7 @@ const lightStyles = StyleSheet.create({
 const darkStyles = StyleSheet.create({
     container: { backgroundColor: '#121212' },
     text: { color: '#fff' },
+    elapsedTimeText: {
+        color: '#ffffff', // Set to white for visibility on black background
+    },
 });

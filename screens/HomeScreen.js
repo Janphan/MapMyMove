@@ -145,6 +145,9 @@ const darkStyles = StyleSheet.create({
     background: {
         opacity: 0.8,
     },
+    activityItem: {
+        backgroundColor: '#1e1e1e', // Darker background for better contrast
+    },
 });
 
 export default HomeScreen;

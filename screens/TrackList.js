@@ -33,13 +33,30 @@ export default function TrackList() {
 
     // Function to delete a track
     const deleteTrack = async (trackId) => {
-        try {
-            await deleteDoc(doc(db, 'tracks', trackId));
-            Alert.alert("Track deleted successfully");
-        } catch (error) {
-            console.error("Error deleting track:", error);
-            Alert.alert("Error", "Could not delete the track. Please try again.");
-        }
+        Alert.alert(
+            "Confirm Deletion",
+            "Are you sure you want to delete this track?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel", // Dismiss the alert
+                },
+                {
+                    text: "Delete",
+                    style: "destructive", // Highlight the delete action
+                    onPress: async () => {
+                        try {
+                            await deleteDoc(doc(db, 'tracks', trackId));
+                            Alert.alert("Track deleted successfully");
+                        } catch (error) {
+                            console.error("Error deleting track:", error);
+                            Alert.alert("Error", "Could not delete the track. Please try again.");
+                        }
+                    },
+                },
+            ],
+            { cancelable: true } // Allow dismissal by tapping outside the alert
+        );
     };
 
     // Filter tracks based on date or duration
