@@ -1,66 +1,47 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './screens/HomeScreen';
-import SettingScreen from './screens/SettingScreen';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { DefaultTheme, DarkTheme, Provider as PaperProvider } from 'react-native-paper';
+import { useState, useEffect, useContext } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
+
+import HomeScreen from './screens/HomeScreen';
+import SettingScreen from './screens/SettingScreen';
 import CalendarComponent from './screens/Calendar';
 import TrackMove from './screens/TrackMove';
 import TrackList from './screens/TrackList';
 import SignupScreen from './screens/SignupScreen';
 import LoginScreen from './screens/LoginScreen';
 import { auth } from './firebaseConfig';
-import { useState, useEffect, useContext } from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { DefaultTheme, DarkTheme, Provider as PaperProvider } from 'react-native-paper';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function AuthStack() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  );
-}
-function TrackStack() {
-  return (
-    <Stack.Navigator initialRouteName="TrackMove">
-      <Stack.Screen name="TrackMove" component={TrackMove} options={{ title: 'Track Move', headerShown: false }} />
-      <Stack.Screen name="TrackList" component={TrackList} options={{ title: 'Track List', headerShown: false }} />
-    </Stack.Navigator>
-  );
-}
-function AppTabs() {
+// Tab Navigator for the main app
+function MainTabs() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({  // Navigator can be customized using screenOptions
-        tabBarIcon: ({ focused, color, size }) => {
-          // Function tabBarIcon is given the focused state,
-          // color and size params
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
           let iconName;
           if (route.name === 'Home') {
             iconName = 'home';
-            return <Feather name={iconName} size={24} color={color} />;
+            return <Feather name={iconName} size={size} color={color} />;
           } else if (route.name === 'Settings') {
             iconName = 'settings';
-            return <Feather name="settings" size={24} color={color} />
-          } else if (route.name == "Calendar") {
-            iconName = "calendar";
-            return <Feather name="calendar" size={24} color={color} />
-          } else if (route.name == "Start") {
-            iconName = "play";
-            return <Feather name="play" size={24} color={color} />
+            return <Feather name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Calendar') {
+            iconName = 'calendar';
+            return <Feather name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Track') {
+            iconName = 'play';
+            return <Feather name={iconName} size={size} color={color} />;
           }
-
-          return <Ionicons name={iconName} size={size} color={color} />;   //it returns an icon component
         },
-        // Customize active/inactive color and label style
-        tabBarActiveTintColor: '#2c3e50',  // Active color
-        tabBarInactiveTintColor: '#95a5a6', // Inactive color
+        tabBarActiveTintColor: '#2c3e50',
+        tabBarInactiveTintColor: '#95a5a6',
         tabBarStyle: {
           backgroundColor: '#E6E6FA',
           paddingBottom: 8,
@@ -75,14 +56,27 @@ function AppTabs() {
           fontWeight: '500',
           paddingBottom: 5,
         },
-      })}>
+      })}
+    >
       <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Start" component={TrackStack} options={{ title: 'Track', headerShown: false }} />
+      <Tab.Screen name="Track" component={TrackStack} options={{ title: 'Track', headerShown: false }} />
       <Tab.Screen name="Calendar" component={CalendarComponent} options={{ headerShown: false }} />
       <Tab.Screen name="Settings" component={SettingScreen} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 }
+
+// Stack Navigator for the Track screens
+function TrackStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="TrackMove" component={TrackMove} options={{ title: 'Track Move', headerShown: false }} />
+      <Stack.Screen name="TrackList" component={TrackList} options={{ title: 'Track List', headerShown: false }} />
+    </Stack.Navigator>
+  );
+}
+
+// Main App Component
 export default function App() {
   return (
     <ThemeProvider>
@@ -96,6 +90,7 @@ function MainApp() {
   const theme = isDarkMode ? DarkTheme : DefaultTheme; // Dynamically set theme
   const [user, setUser] = useState(null);
   const [initializing, setInitializing] = useState(true);
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       setUser(authUser);
@@ -111,9 +106,14 @@ function MainApp() {
       <NavigationContainer theme={theme}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {user ? (
-            <Stack.Screen name="AppTabs" component={AppTabs} />
+            // Main app tabs for authenticated users
+            <Stack.Screen name="MainTabs" component={MainTabs} />
           ) : (
-            <Stack.Screen name="AuthStack" component={AuthStack} />
+            // Authentication screens for unauthenticated users
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Signup" component={SignupScreen} />
+            </>
           )}
         </Stack.Navigator>
       </NavigationContainer>

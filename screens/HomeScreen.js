@@ -5,6 +5,8 @@ import { auth } from '../firebaseConfig';
 import { PaperProvider, Button, Text } from 'react-native-paper';
 import { logout } from '../services/authService';
 import { ThemeContext } from '../context/ThemeContext';
+import { doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
+import { db } from '../firebaseConfig'; // Firestore instance
 
 const activities = [
     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km', duration: "1 hour" },  // Example for yesterday
@@ -15,12 +17,24 @@ const HomeScreen = () => {
     const navigation = useNavigation();
     const { isDarkMode } = useContext(ThemeContext); // Access dark mode state
     const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
-    const [yesterdaysActivities, setYesterdaysActivities] = useState([]);
     const [user, setUser] = useState(null);
+    const [username, setUsername] = useState('');
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             setUser(authUser);
+            if (authUser) {
+                const userRef = doc(db, 'users', authUser.uid); // Reference to the user's document
+                getDoc(userRef).then((docSnap) => {
+                    if (docSnap.exists()) {
+                        setUsername(docSnap.data().displayName); // Set the username from Firestore
+                    } else {
+                        console.log('No such document!');
+                    }
+                }).catch((error) => {
+                    console.error('Error fetching user data:', error);
+                });
+            }
         });
 
         return () => unsubscribe();
@@ -56,7 +70,7 @@ const HomeScreen = () => {
             >
                 <View style={[styles.container, dynamicStyles.container]}>
                     {/* Greeting Message */}
-                    <Text style={[styles.greeting, dynamicStyles.text]}>Welcome!</Text>
+                    <Text style={[styles.greeting, dynamicStyles.text]}>Welcome {username}!</Text>
 
                     {/* Activities Section */}
                     <Text style={[styles.subtitle, dynamicStyles.text]}>Yesterday's Activities</Text>

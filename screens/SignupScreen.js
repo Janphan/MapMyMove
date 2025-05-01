@@ -1,31 +1,93 @@
 import React, { useState } from 'react';
 import { View, Alert, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import { TextInput, Button, Text, PaperProvider } from 'react-native-paper';
-import { signUp } from '../services/authService'; // Assuming signUp function handles Firebase signup
-import { auth } from '../firebaseConfig'; // Firebase config
+import { signUp } from '../services/authService';
 import logo2 from '../assets/logo2.jpg';
+import { db } from '../firebaseConfig';
+import { sendEmailVerification } from 'firebase/auth';
+import { query, where, collection, getDocs, setDoc, doc } from 'firebase/firestore';
 
 export default function SignupScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+
+    // Utility function to validate email format
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
+        return emailRegex.test(email);
+    };
 
     const handleSignup = async () => {
-        if (!email || !password) {
-            Alert.alert('Error', 'Please fill in both fields.');
+        if (!username || !email || !password) {
+            Alert.alert('Error', 'Please fill in all fields.');
             return;
         }
         try {
+            const usersRef = collection(db, 'users');
+            const usernameQuery = query(usersRef, where("username", "==", username));
+            const querySnapshot = await getDocs(usernameQuery);
+            if (!querySnapshot.empty) {
+                Alert.alert('Error', 'Username already exists. Please choose a different username.');
+                return;
+            }
+            if (!validateEmail(email)) {
+                Alert.alert('Invalid Email', 'Please enter a valid email address.');
+                return;
+            }
+            if (password.length < 6) {
+                Alert.alert('Password Too Short', 'Password must be at least 6 characters.');
+                return;
+            }
+            // Check if email is already in use
+            const emailQuery = query(usersRef, where("email", "==", email));
+            const emailSnapshot = await getDocs(emailQuery);
+            if (!emailSnapshot.empty) {
+
+                Alert.alert('Error', 'Email already in use. Please use a different email.');
+                return;
+            }
+            // Create user with email and password
+
             const userCredential = await signUp(email, password);
             console.log("User Credential:", userCredential);
-            // The user is always inside the userCredential.user
+
+            const user = userCredential?.user; // Safely access the user object
+            if (!user) {
+                throw new Error('User creation failed. No user object returned.');
+            }
+
+            console.log("User Object:", user);
+
+            // Save username and email to Firestore
+            await setDoc(doc(db, 'users', user.uid), {
+                displayName: username,
+                email: email,
+
+            });
+            console.log("Username:", username);
+            console.log("Email:", email);
+
             Alert.alert('Success', 'Account created successfully!');
-            navigation.navigate('Login');
+            await sendEmailVerification(user); // Send email verification
+            Alert.alert('Verification Email Sent', 'Please check your email to verify your account.');
+            navigation.navigate('Login'); // Navigate to login screen after successful signup
         } catch (error) {
-            Alert.alert('Error', error.message);
+            if (error.code === 'auth/email-already-in-use') {
+                Alert.alert('Error', 'Email already in use. Please use a different email.');
+            }
+            else if (error.code === 'auth/invalid-email') {
+                Alert.alert('Error', 'Invalid email format. Please enter a valid email.');
+            }
+            else if (error.code === 'auth/weak-password') {
+                Alert.alert('Error', 'Password should be at least 6 characters long.');
+            }
+            else if (error.code === 'auth/operation-not-allowed') {
+                Alert.alert('Error', 'Email/Password sign-in is not enabled. Please contact support.');
+            }
+            console.error('Error signing up:', error.message);
         }
     };
-
-
 
     return (
         <PaperProvider>
@@ -45,6 +107,14 @@ export default function SignupScreen({ navigation }) {
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
+                        autoCapitalize="none"
+                        style={styles.input}
+                    />
+                    <TextInput
+                        label="Username"
+                        mode="outlined"
+                        value={username}
+                        onChangeText={setUsername}
                         autoCapitalize="none"
                         style={styles.input}
                     />

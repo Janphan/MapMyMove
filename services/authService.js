@@ -7,10 +7,10 @@ import { auth } from '../firebaseConfig'; // Firebase auth initialized in fireba
 export const signUp = async (email, password) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        return userCredential.user; // Return user info if sign-up is successful
+        return userCredential; // Return the full userCredential object
     } catch (error) {
         console.error('Error signing up:', error.message);
-        throw error;  // Handle the error appropriately in your UI (e.g., show an error message)
+        throw error;
     }
 };
 
