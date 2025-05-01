@@ -23,7 +23,7 @@ export default function LoginScreen({ navigation }) {
         try {
             await login(email, password);
             Alert.alert('Success', 'Logged in successfully!');
-            navigation.navigate('AppTabs', { screen: 'Home' });
+            navigation.navigate('Home');
         } catch (error) {
             Alert.alert('Login Failed', error.message || 'An error occurred during login.');
         }

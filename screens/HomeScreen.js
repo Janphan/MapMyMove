@@ -44,10 +44,7 @@ const HomeScreen = () => {
         try {
             await logout();  // Use the logout function here
             Alert.alert('Logged Out', 'You have been logged out successfully.');
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }], // Reset the stack and navigate to Login
-            });
+            navigation.navigate('Login');
         } catch (error) {
             Alert.alert('Logout Failed', 'An error occurred while logging out.');
         }
