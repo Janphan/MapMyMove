@@ -9,11 +9,6 @@ import { collection, doc, getDoc, orderBy, getDocs, query, onSnapshot } from 'fi
 import { db } from '../firebaseConfig'; // Firestore instance
 import { calculateTotalDistance } from '../utils/distanceUtils';
 
-// const activities = [
-//     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km', duration: "1 hour" },  // Example for yesterday
-//     { id: '2', type: 'Walk', date: '2024-10-25', distance: '3 km', duration: "45 minutes" },  // Example for the day before
-// ];
-
 const HomeScreen = () => {
     const navigation = useNavigation();
     const { isDarkMode } = useContext(ThemeContext); // Access dark mode state
@@ -21,6 +16,7 @@ const HomeScreen = () => {
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState('');
     const [activities, setActivities] = useState([]);
+
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
@@ -73,6 +69,7 @@ const HomeScreen = () => {
 
     const renderActivityItem = ({ item }) => (
         <View style={[styles.activityItem, dynamicStyles.activityItem]}>
+            <Text style={dynamicStyles.text}>Type: {item.type}</Text>
             <Text style={dynamicStyles.text}>Date: {item.date}</Text>
             <Text style={dynamicStyles.text}>
                 Distance: {item.locations ? `${calculateTotalDistance(item.locations)} km` : 'N/A'}

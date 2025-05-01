@@ -1,9 +1,9 @@
 import { StyleSheet, View, Alert, Keyboard } from 'react-native';
-import { Button, Text, PaperProvider, TextInput } from 'react-native-paper';
+import { Button, Text, PaperProvider, TextInput, Menu } from 'react-native-paper';
 import { useState, useEffect, useContext } from 'react';
 import MyMap from '../components/MyMap';
 import { useNavigation } from '@react-navigation/native';
-import { getFirestore, collection, addDoc, Timestamp } from 'firebase/firestore'; // Import Timestamp
+import { getFirestore, collection, addDoc, Timestamp } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import * as Location from 'expo-location';
 import { ThemeContext } from '../context/ThemeContext';
@@ -19,12 +19,14 @@ export default function TrackMove() {
         longitudeDelta: 0.0221,
     });
     const [currentLocation, setCurrentLocation] = useState(null);
-    const [locations, setLocations] = useState([]); // Store the locations for the route
-    const [isTracking, setIsTracking] = useState(false); // Track if we are currently tracking
+    const [locations, setLocations] = useState([]);
+    const [isTracking, setIsTracking] = useState(false);
     const [elapsedTime, setElapsedTime] = useState(0);
     const [timer, setTimer] = useState(null);
     const { isDarkMode } = useContext(ThemeContext);
     const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
+    const [menuVisible, setMenuVisible] = useState(true);
+    const [selectedType, setSelectedType] = useState(null);
 
     //format date
     const formatDate = (date) => {
@@ -36,7 +38,8 @@ export default function TrackMove() {
     };
 
     // Start tracking
-    const startTracking = async () => {
+    const startTracking = async (type) => {
+        setSelectedType(type); // Set the selected type
         setIsTracking(true);
         setLocations([]);
         setTimer(setInterval(() => {
@@ -49,7 +52,7 @@ export default function TrackMove() {
                 Alert.alert('Permission not granted to access location');
                 return;
             }
-            Location.watchPositionAsync(
+            await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.High,
                     distanceInterval: 1,
@@ -58,14 +61,14 @@ export default function TrackMove() {
                     const { latitude, longitude } = newLocation.coords;
                     setLocations((prevLocations) => [
                         ...prevLocations,
-                        { latitude, longitude }
+                        { latitude, longitude },
                     ]);
                     setMarker({ latitude, longitude, title: 'Current Location', color: '#3498db' });
                     setRegion({ latitude, longitude, latitudeDelta: 0.0322, longitudeDelta: 0.0221 });
                 }
             );
         } catch (error) {
-            console.error("Error starting location tracking:", error);
+            console.error('Error starting location tracking:', error);
         }
     };
 
@@ -78,6 +81,7 @@ export default function TrackMove() {
         }
 
         const newTrack = {
+            type: selectedType,
             date: Timestamp.fromDate(new Date()), // Store as Firestore Timestamp
             duration: elapsedTime,
             locations,
@@ -92,6 +96,7 @@ export default function TrackMove() {
             Alert.alert('Error', 'Could not save tracking data. Please try again.');
         }
         setElapsedTime(0); // Reset timer for next session
+        setLocations([]);
         navigation.navigate('TrackList'); // Navigate to TrackList screen
     };
 
@@ -113,6 +118,37 @@ export default function TrackMove() {
     return (
         <PaperProvider>
             <View style={[styles.container, dynamicStyles.container]}>
+                <Menu
+                    visible={menuVisible}
+                    onDismiss={() => setMenuVisible(false)}
+                    anchor={
+                        <Button mode="outlined" onPress={() => setMenuVisible(true)}>
+                            {selectedType || 'Select Activity Type'}
+                        </Button>
+                    }
+                >
+                    <Menu.Item
+                        onPress={() => {
+                            setMenuVisible(false);
+                            startTracking('Run'); // Start tracking with "Run"
+                        }}
+                        title="Run"
+                    />
+                    <Menu.Item
+                        onPress={() => {
+                            setMenuVisible(false);
+                            startTracking('Walk'); // Start tracking with "Walk"
+                        }}
+                        title="Walk"
+                    />
+                    <Menu.Item
+                        onPress={() => {
+                            setMenuVisible(false);
+                            startTracking('Swim'); // Start tracking with "Swim"
+                        }}
+                        title="Swim"
+                    />
+                </Menu>
                 <View style={styles.mapContainer}>
                     <MyMap region={region} marker={marker} locations={locations} />
                     <Text style={[styles.elapsedTimeText, dynamicStyles.elapsedTimeText]}>
@@ -121,7 +157,7 @@ export default function TrackMove() {
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <Button mode="contained" onPress={isTracking ? stopTracking : startTracking} style={styles.mainButton}>
+                    <Button mode="contained" onPress={isTracking ? stopTracking : startTracking} style={styles.mainButton} disabled={!selectedType && !isTracking}>
                         {isTracking ? 'Stop Tracking' : 'Start Tracking'}
                     </Button>
                     <Button mode="contained" onPress={() => navigation.navigate('TrackList')} style={styles.secondaryButton}>
@@ -139,16 +175,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     mapContainer: {
-        flex: 8, // 80% of the screen height
+        flex: 8,
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
     buttonContainer: {
-        flex: 1, // 20% of the screen height
-        justifyContent: 'center', // Center contents vertically
-        alignItems: 'center', // Center contents horizontally
-        padding: 20, // Add some padding
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
     mainButton: {
         width: '75%',
