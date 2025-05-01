@@ -1,1 +1,0 @@
-// Component to display user performance via charts

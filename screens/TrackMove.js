@@ -3,7 +3,7 @@ import { Button, Text, PaperProvider, TextInput } from 'react-native-paper';
 import { useState, useEffect, useContext } from 'react';
 import MyMap from '../components/MyMap';
 import { useNavigation } from '@react-navigation/native';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, Timestamp } from 'firebase/firestore'; // Import Timestamp
 import { app } from '../firebaseConfig';
 import * as Location from 'expo-location';
 import { ThemeContext } from '../context/ThemeContext';
@@ -78,7 +78,7 @@ export default function TrackMove() {
         }
 
         const newTrack = {
-            date: formatDate(new Date()),
+            date: Timestamp.fromDate(new Date()), // Store as Firestore Timestamp
             duration: elapsedTime,
             locations,
         };

@@ -7,6 +7,7 @@ import { logout } from '../services/authService';
 import { ThemeContext } from '../context/ThemeContext';
 import { collection, doc, getDoc, orderBy, getDocs, query, onSnapshot } from 'firebase/firestore'; // Import Firestore functions
 import { db } from '../firebaseConfig'; // Firestore instance
+import { calculateTotalDistance } from '../utils/distanceUtils';
 
 // const activities = [
 //     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km', duration: "1 hour" },  // Example for yesterday
@@ -42,15 +43,21 @@ const HomeScreen = () => {
     }, []);
 
     useEffect(() => {
-        const trackRef = collection(db, 'tracks'); // Reference to the 'tracks' collection
-        const trackQuery = query(trackRef, orderBy('date', 'desc')); // Query to order by 'date' descending
+        const trackRef = collection(db, 'tracks');
+        const trackQuery = query(trackRef, orderBy('date', 'desc'));
 
         // Real-time listener for the 'tracks' collection
         const unsubscribe = onSnapshot(trackQuery, (querySnapshot) => {
-            const fetchedActivities = querySnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
+            const fetchedActivities = querySnapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    date: data.date?.seconds
+                        ? new Date(data.date.seconds * 1000).toLocaleDateString('en-GB') // Convert Firestore Timestamp to string
+                        : data.date, // Keep as is if already a string
+                };
+            });
 
             console.log('Fetched Activities (Real-Time):', fetchedActivities);
             setActivities(fetchedActivities);
@@ -66,10 +73,11 @@ const HomeScreen = () => {
 
     const renderActivityItem = ({ item }) => (
         <View style={[styles.activityItem, dynamicStyles.activityItem]}>
-            <Text style={dynamicStyles.text}>{item.type}</Text>
             <Text style={dynamicStyles.text}>Date: {item.date}</Text>
-            <Text style={dynamicStyles.text}>Distance: {item.distance}</Text>
-            <Text style={dynamicStyles.text}>Duration: {item.duration}</Text>
+            <Text style={dynamicStyles.text}>
+                Distance: {item.locations ? `${calculateTotalDistance(item.locations)} km` : 'N/A'}
+            </Text>
+            <Text style={dynamicStyles.text}>Duration: {item.duration || 'N/A'} seconds</Text>
         </View>
     );
 
@@ -91,11 +99,6 @@ const HomeScreen = () => {
                         keyExtractor={(item) => item.id}
                         style={styles.activityList}
                     />
-
-                    {/* Start Button */}
-                    <Button mode="contained" icon="play-circle-outline" onPress={() => navigation.navigate('Start')} style={styles.startButton}>
-                        Start
-                    </Button>
                 </View>
             </ImageBackground>
         </PaperProvider>
