@@ -1,10 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { StyleSheet, View, Switch } from 'react-native';
 import { Button, Text, Divider } from 'react-native-paper';
 import { ThemeContext } from '../context/ThemeContext';
+import LogoutButton from '../components/LogoutButton';
+import ChangePassword from '../components/ChangePassword';
 
 export default function SettingScreen() {
     const { isDarkMode, setIsDarkMode } = useContext(ThemeContext);
+    const [isChangePasswordVisible, setIsChangePasswordVisible] = useState(false); // Correct state declaration
 
     // Dynamically set styles based on dark mode
     const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
@@ -15,6 +18,7 @@ export default function SettingScreen() {
             <Text variant="titleLarge" style={[styles.sectionTitle, dynamicStyles.text]}>(Under development)</Text>
             <Text variant="titleLarge" style={[styles.sectionTitle, dynamicStyles.text]}>Account</Text>
             <View style={styles.buttonContainer}>
+                <LogoutButton />
                 <Button
                     mode="contained"
                     onPress={() => { /* Navigate to Edit Profile */ }}
@@ -24,7 +28,7 @@ export default function SettingScreen() {
                 </Button>
                 <Button
                     mode="contained"
-                    onPress={() => { /* Navigate to Change Password */ }}
+                    onPress={() => setIsChangePasswordVisible(true)} // Correctly set the state to show the modal
                     style={styles.button}
                 >
                     Change Password
@@ -55,6 +59,12 @@ export default function SettingScreen() {
                     onValueChange={() => setIsDarkMode(!isDarkMode)}
                 />
             </View>
+
+            {/* Change Password Modal */}
+            <ChangePassword
+                visible={isChangePasswordVisible} // Pass the visibility state to the component
+                onClose={() => setIsChangePasswordVisible(false)} // Close the modal by setting the state to false
+            />
         </View>
     );
 }

@@ -40,16 +40,6 @@ const HomeScreen = () => {
         return () => unsubscribe();
     }, []);
 
-    const handleLogout = async () => {
-        try {
-            await logout();  // Use the logout function here
-            Alert.alert('Logged Out', 'You have been logged out successfully.');
-            navigation.navigate('Login');
-        } catch (error) {
-            Alert.alert('Logout Failed', 'An error occurred while logging out.');
-        }
-    };
-
     const renderActivityItem = ({ item }) => (
         <View style={[styles.activityItem, dynamicStyles.activityItem]}>
             <Text style={dynamicStyles.text}>{item.type}</Text>
@@ -81,11 +71,6 @@ const HomeScreen = () => {
                     {/* Start Button */}
                     <Button mode="contained" icon="play-circle-outline" onPress={() => navigation.navigate('Start')} style={styles.startButton}>
                         Start
-                    </Button>
-
-                    {/* Logout Button */}
-                    <Button mode="contained" onPress={handleLogout} color="red" style={styles.logoutButton}>
-                        Log Out
                     </Button>
                 </View>
             </ImageBackground>
