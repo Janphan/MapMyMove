@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, use } from 'react';
 import { View, StyleSheet, FlatList, ImageBackground, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebaseConfig';
 import { PaperProvider, Button, Text } from 'react-native-paper';
 import { logout } from '../services/authService';
 import { ThemeContext } from '../context/ThemeContext';
-import { doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
+import { collection, doc, getDoc, orderBy, getDocs, query, onSnapshot } from 'firebase/firestore'; // Import Firestore functions
 import { db } from '../firebaseConfig'; // Firestore instance
 
-const activities = [
-    { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km', duration: "1 hour" },  // Example for yesterday
-    { id: '2', type: 'Walk', date: '2024-10-25', distance: '3 km', duration: "45 minutes" },  // Example for the day before
-];
+// const activities = [
+//     { id: '1', type: 'Run', date: '2024-10-26', distance: '5 km', duration: "1 hour" },  // Example for yesterday
+//     { id: '2', type: 'Walk', date: '2024-10-25', distance: '3 km', duration: "45 minutes" },  // Example for the day before
+// ];
 
 const HomeScreen = () => {
     const navigation = useNavigation();
@@ -19,15 +19,16 @@ const HomeScreen = () => {
     const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState('');
+    const [activities, setActivities] = useState([]);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             setUser(authUser);
             if (authUser) {
-                const userRef = doc(db, 'users', authUser.uid); // Reference to the user's document
+                const userRef = doc(db, 'users', authUser.uid);
                 getDoc(userRef).then((docSnap) => {
                     if (docSnap.exists()) {
-                        setUsername(docSnap.data().displayName); // Set the username from Firestore
+                        setUsername(docSnap.data().displayName);
                     } else {
                         console.log('No such document!');
                     }
@@ -39,6 +40,29 @@ const HomeScreen = () => {
 
         return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        const trackRef = collection(db, 'tracks'); // Reference to the 'tracks' collection
+        const trackQuery = query(trackRef, orderBy('date', 'desc')); // Query to order by 'date' descending
+
+        // Real-time listener for the 'tracks' collection
+        const unsubscribe = onSnapshot(trackQuery, (querySnapshot) => {
+            const fetchedActivities = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+
+            console.log('Fetched Activities (Real-Time):', fetchedActivities);
+            setActivities(fetchedActivities);
+        }, (error) => {
+            console.error('Error fetching activities in real-time:', error);
+            Alert.alert('Error', 'Failed to load activities.');
+        });
+
+        // Cleanup the listener when the component unmounts
+        return () => unsubscribe();
+    }, []);
+
 
     const renderActivityItem = ({ item }) => (
         <View style={[styles.activityItem, dynamicStyles.activityItem]}>
@@ -60,7 +84,7 @@ const HomeScreen = () => {
                     <Text style={[styles.greeting, dynamicStyles.text]}>Welcome {username}!</Text>
 
                     {/* Activities Section */}
-                    <Text style={[styles.subtitle, dynamicStyles.text]}>Yesterday's Activities</Text>
+                    <Text style={[styles.subtitle, dynamicStyles.text]}>Nearest's Activities</Text>
                     <FlatList
                         data={activities}
                         renderItem={renderActivityItem}

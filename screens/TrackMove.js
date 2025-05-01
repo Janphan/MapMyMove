@@ -92,6 +92,7 @@ export default function TrackMove() {
             Alert.alert('Error', 'Could not save tracking data. Please try again.');
         }
         setElapsedTime(0); // Reset timer for next session
+        navigation.navigate('TrackList'); // Navigate to TrackList screen
     };
 
     useEffect(() => {

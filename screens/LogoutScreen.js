@@ -7,10 +7,7 @@ export default function LogoutScreen({ navigation }) {
         try {
             await clearSession();
             Alert.alert('Logged Out', 'You have been logged out successfully.');
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }], // Redirect to Login screen
-            });
+            navigation.navigatite('Login');
         } catch (error) {
             Alert.alert('Logout Failed', 'An error occurred while logging out.');
         }

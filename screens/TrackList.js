@@ -142,11 +142,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     filterContainer: {
-        flexDirection: 'row', // Place filters side by side
+        flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '100%', // Use full width
+        width: '100%',
         marginBottom: 20,
         paddingHorizontal: 20,
+        marginTop: 20,
+        paddingTop: 40,
     },
     filterInput: {
         width: '45%', // Make each input 45% of the width
