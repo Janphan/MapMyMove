@@ -51,9 +51,15 @@ Follow these steps to clone the repository and run the app on a mobile device.
 
 ### Main App Navigation:
 
-**AuthStack:** Manages login and signup screens.
-
-**AppTabs:** The main app tab navigation includes screens for Home, Start (tracking movements), Calendar, and Settings.
+**AuthStack**: Manages the Login and Signup screens for unauthenticated users.
+**MainTabs**: The main app tab navigation for authenticated users, which includes:
+- Home: Displays the HomeScreen.
+- Track: A nested stack (TrackStack) for tracking movements, including:
+- TrackMove: For tracking movements.
+- TrackList: For listing tracked movements.
+- Calendar: Displays the CalendarComponent.
+- Settings: Displays the SettingScreen.
+- TrackStack: A nested Stack.Navigator inside the "Track" tab, managing TrackMove and TrackList.
 
 ### Screens:
 
@@ -71,8 +77,13 @@ Follow these steps to clone the repository and run the app on a mobile device.
 
 **Sign Up / Log In:** Create an account or log in to access the app’s features.
 
+
 **Track Movements:** Start tracking your movements in the "Start" section.
 
 **View Calendar:** Review past movements and plan upcoming ones using the Calendar.
 
-**Customize Settings:** Modify app preferences in the Settings section.
+**Customize Settings:** Modify app preferences in the Settings section, include:
+- Dark Theme/ Light Theme
+- Change Password
+- Logout
+- Edit profile
