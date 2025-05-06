@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { getFirestore, collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import { ThemeContext } from '../context/ThemeContext';
+import { calculateTotalDistance } from '../utils/distanceUtils'; // Assuming you have a utility function to calculate distance
 
 export default function TrackList() {
     const navigation = useNavigation();
@@ -72,25 +73,31 @@ export default function TrackList() {
         Keyboard.dismiss();
     };
 
-    const renderTrackItem = ({ item }) => (
-        <View style={styles.trackItem}>
-            <Text>Type: {item.type || 'N/A'}</Text>
-            <Text>
-                Date: {item.date?.seconds ? new Date(item.date.seconds * 1000).toLocaleDateString('en-GB') : 'N/A'}
-            </Text>
-            <Text>Duration: {item.duration || 'N/A'} seconds</Text>
-            <Text>
-                Locations: {item.locations ? `${item.locations.length} points` : 'No locations'}
-            </Text>
-            <Button
-                mode="contained"
-                onPress={() => deleteTrack(item.id)}
-                style={styles.deleteButton}
-            >
-                Delete
-            </Button>
-        </View>
-    );
+    const renderTrackItem = ({ item }) => {
+        return (
+            <View style={styles.trackItem}>
+                <View style={styles.trackInfoContainer}>
+                    <Text style={styles.trackText}>Type: {item.type || 'N/A'}</Text>
+                    <Text style={styles.trackText}>
+                        Date: {item.date?.seconds ? new Date(item.date.seconds * 1000).toLocaleDateString('en-GB') : 'N/A'}
+                    </Text>
+                    <Text style={styles.trackText}>Duration: {item.duration || 'N/A'} seconds</Text>
+                    <Text style={styles.trackText}>
+                        Distance: {item.locations ? `${calculateTotalDistance(item.locations)} km` : 'N/A'}
+                    </Text>
+                </View>
+                <View style={styles.deleteButtonContainer}>
+                    <Button
+                        mode="contained"
+                        onPress={() => deleteTrack(item.id)}
+                        style={styles.deleteButton}
+                    >
+                        Delete
+                    </Button>
+                </View>
+            </View>
+        );
+    };
 
     return (
         <PaperProvider>
