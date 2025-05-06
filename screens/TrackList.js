@@ -72,6 +72,26 @@ export default function TrackList() {
         Keyboard.dismiss();
     };
 
+    const renderTrackItem = ({ item }) => (
+        <View style={styles.trackItem}>
+            <Text>Type: {item.type || 'N/A'}</Text>
+            <Text>
+                Date: {item.date?.seconds ? new Date(item.date.seconds * 1000).toLocaleDateString('en-GB') : 'N/A'}
+            </Text>
+            <Text>Duration: {item.duration || 'N/A'} seconds</Text>
+            <Text>
+                Locations: {item.locations ? `${item.locations.length} points` : 'No locations'}
+            </Text>
+            <Button
+                mode="contained"
+                onPress={() => deleteTrack(item.id)}
+                style={styles.deleteButton}
+            >
+                Delete
+            </Button>
+        </View>
+    );
+
     return (
         <PaperProvider>
             <View style={[styles.filterContainer, dynamicStyles.container]}>
@@ -106,19 +126,7 @@ export default function TrackList() {
                     <FlatList
                         data={filteredTracks}
                         keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <View style={styles.trackItem}>
-                                <Text style={[styles.trackText, dynamicStyles.text]}>{item.date} - Duration: {item.duration}s</Text>
-                                <Button
-                                    mode="contained"
-                                    color="red"
-                                    onPress={() => deleteTrack(item.id)}
-                                    style={styles.deleteButton}
-                                >
-                                    Delete
-                                </Button>
-                            </View>
-                        )}
+                        renderItem={renderTrackItem}
                         contentContainerStyle={styles.listContent}
                     />
                 )}

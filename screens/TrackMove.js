@@ -82,7 +82,7 @@ export default function TrackMove() {
 
         const newTrack = {
             type: selectedType,
-            date: Timestamp.fromDate(new Date()), // Store as Firestore Timestamp
+            date: new Date().toISOString(), // Save as ISO string instead of Firestore Timestamp
             duration: elapsedTime,
             locations,
         };
@@ -153,6 +153,9 @@ export default function TrackMove() {
                     <MyMap region={region} marker={marker} locations={locations} />
                     <Text style={[styles.elapsedTimeText, dynamicStyles.elapsedTimeText]}>
                         Elapsed Time: {elapsedTime}s
+                    </Text>
+                    <Text>
+                        Locations: {locations.length > 0 ? `${locations.length} points` : 'No locations'}
                     </Text>
                 </View>
 
