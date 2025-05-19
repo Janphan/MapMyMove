@@ -79,7 +79,11 @@ export default function TrackList() {
                 <View style={styles.trackInfoContainer}>
                     <Text style={styles.trackText}>Type: {item.type || 'N/A'}</Text>
                     <Text style={styles.trackText}>
-                        Date: {item.date?.seconds ? new Date(item.date.seconds * 1000).toLocaleDateString('en-GB') : 'N/A'}
+                        Date: {item.date
+                            ? (item.date.seconds
+                                ? new Date(item.date.seconds * 1000).toLocaleDateString('en-GB')
+                                : new Date(item.date).toLocaleDateString('en-GB'))
+                            : 'N/A'}
                     </Text>
                     <Text style={styles.trackText}>Duration: {item.duration || 'N/A'} seconds</Text>
                     <Text style={styles.trackText}>
