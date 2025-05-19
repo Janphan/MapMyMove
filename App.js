@@ -15,6 +15,7 @@ import SignupScreen from './screens/SignupScreen';
 import LoginScreen from './screens/LoginScreen';
 import { auth } from './firebaseConfig';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
+import TrackDetail from './screens/TrackDetail';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -72,6 +73,7 @@ function TrackStack() {
     <Stack.Navigator>
       <Stack.Screen name="TrackMove" component={TrackMove} options={{ title: 'Track Move', headerShown: false }} />
       <Stack.Screen name="TrackList" component={TrackList} options={{ title: 'Track List', headerShown: false }} />
+      <Stack.Screen name="TrackDetail" component={TrackDetail} options={{ title: 'Track Detail', headerShown: false }} />
     </Stack.Navigator>
   );
 }

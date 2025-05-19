@@ -1,4 +1,4 @@
-import { StyleSheet, View, FlatList, Alert, Keyboard } from 'react-native';
+import { StyleSheet, View, FlatList, Alert, Keyboard, TouchableOpacity } from 'react-native';
 import { Button, Text, PaperProvider, TextInput } from 'react-native-paper';
 import { useState, useEffect, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -75,31 +75,33 @@ export default function TrackList() {
 
     const renderTrackItem = ({ item }) => {
         return (
-            <View style={styles.trackItem}>
-                <View style={styles.trackInfoContainer}>
-                    <Text style={styles.trackText}>Type: {item.type || 'N/A'}</Text>
-                    <Text style={styles.trackText}>
-                        Date: {item.date
-                            ? (item.date.seconds
-                                ? new Date(item.date.seconds * 1000).toLocaleDateString('en-GB')
-                                : new Date(item.date).toLocaleDateString('en-GB'))
-                            : 'N/A'}
-                    </Text>
-                    <Text style={styles.trackText}>Duration: {item.duration || 'N/A'} seconds</Text>
-                    <Text style={styles.trackText}>
-                        Distance: {item.locations ? `${calculateTotalDistance(item.locations)} km` : 'N/A'}
-                    </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('TrackDetail', { track: item })}>
+                <View style={styles.trackItem}>
+                    <View style={styles.trackInfoContainer}>
+                        <Text style={styles.trackText}>Type: {item.type || 'N/A'}</Text>
+                        <Text style={styles.trackText}>
+                            Date: {item.date
+                                ? (item.date.seconds
+                                    ? new Date(item.date.seconds * 1000).toLocaleDateString('en-GB')
+                                    : new Date(item.date).toLocaleDateString('en-GB'))
+                                : 'N/A'}
+                        </Text>
+                        <Text style={styles.trackText}>Duration: {item.duration || 'N/A'} seconds</Text>
+                        <Text style={styles.trackText}>
+                            Distance: {item.locations ? `${calculateTotalDistance(item.locations)} km` : 'N/A'}
+                        </Text>
+                    </View>
+                    <View style={styles.deleteButtonContainer}>
+                        <Button
+                            mode="contained"
+                            onPress={() => deleteTrack(item.id)}
+                            style={styles.deleteButton}
+                        >
+                            Delete
+                        </Button>
+                    </View>
                 </View>
-                <View style={styles.deleteButtonContainer}>
-                    <Button
-                        mode="contained"
-                        onPress={() => deleteTrack(item.id)}
-                        style={styles.deleteButton}
-                    >
-                        Delete
-                    </Button>
-                </View>
-            </View>
+            </TouchableOpacity>
         );
     };
 
