@@ -7,6 +7,7 @@ import { getFirestore, collection, addDoc, Timestamp } from 'firebase/firestore'
 import { app } from '../firebaseConfig';
 import * as Location from 'expo-location';
 import { ThemeContext } from '../context/ThemeContext';
+import { Modal, TouchableOpacity } from 'react-native';
 
 export default function TrackMove() {
     const db = getFirestore(app);
@@ -25,8 +26,8 @@ export default function TrackMove() {
     const [timer, setTimer] = useState(null);
     const { isDarkMode } = useContext(ThemeContext);
     const dynamicStyles = isDarkMode ? darkStyles : lightStyles;
-    const [menuVisible, setMenuVisible] = useState(true);
     const [selectedType, setSelectedType] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     //format date
     const formatDate = (date) => {
@@ -118,50 +119,61 @@ export default function TrackMove() {
     return (
         <PaperProvider>
             <View style={[styles.container, dynamicStyles.container]}>
-                <Menu
-                    visible={menuVisible}
-                    onDismiss={() => setMenuVisible(false)}
-                    anchor={
-                        <Button mode="outlined" onPress={() => setMenuVisible(true)}>
-                            {selectedType || 'Select Activity Type'}
-                        </Button>
-                    }
+                {/* Activity Type Modal */}
+                <Modal
+                    visible={modalVisible}
+                    transparent
+                    animationType="slide"
+                    onRequestClose={() => setModalVisible(false)}
                 >
-                    <Menu.Item
-                        onPress={() => {
-                            setMenuVisible(false);
-                            startTracking('Run'); // Start tracking with "Run"
-                        }}
-                        title="Run"
-                    />
-                    <Menu.Item
-                        onPress={() => {
-                            setMenuVisible(false);
-                            startTracking('Walk'); // Start tracking with "Walk"
-                        }}
-                        title="Walk"
-                    />
-                    <Menu.Item
-                        onPress={() => {
-                            setMenuVisible(false);
-                            startTracking('Swim'); // Start tracking with "Swim"
-                        }}
-                        title="Swim"
-                    />
-                </Menu>
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 20 }}>Select Activity Type</Text>
+                            {['Run', 'Walk', 'Cycling'].map(type => (
+                                <TouchableOpacity
+                                    key={type}
+                                    style={styles.typeOption}
+                                    onPress={() => {
+                                        setSelectedType(type);
+                                        setModalVisible(false);
+                                        startTracking(type); // Start tracking after selecting type
+                                    }}
+                                >
+                                    <Text style={{ fontSize: 16 }}>{type}</Text>
+                                </TouchableOpacity>
+                            ))}
+                            <Button onPress={() => setModalVisible(false)} style={{ marginTop: 20 }}>Cancel</Button>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Button to open modal */}
+                <Button mode="outlined" onPress={() => setModalVisible(true)} style={{ marginBottom: 10 }}>
+                    {selectedType || 'Select Activity Type'}
+                </Button>
                 <View style={styles.mapContainer}>
                     <MyMap region={region} marker={marker} locations={locations} />
                     <Text style={[styles.elapsedTimeText, dynamicStyles.elapsedTimeText]}>
                         Elapsed Time: {elapsedTime}s
                     </Text>
-                    <Text>
+                    {/* <Text>
                         Locations: {locations.length > 0 ? `${locations.length} points` : 'No locations'}
-                    </Text>
+                    </Text> */}
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <Button mode="contained" onPress={isTracking ? stopTracking : startTracking} style={styles.mainButton} disabled={!selectedType && !isTracking}>
-                        {isTracking ? 'Stop Tracking' : 'Start Tracking'}
+                    <Button
+                        mode="contained"
+                        onPress={() => {
+                            if (isTracking) {
+                                stopTracking();
+                            } else {
+                                setModalVisible(true);
+                            }
+                        }}
+                        style={styles.mainButton}
+                    >
+                        {isTracking ? 'Stop Tracking' : (selectedType ? `Start (${selectedType})` : 'Start Tracking')}
                     </Button>
                     <Button mode="contained" onPress={() => navigation.navigate('TrackList')} style={styles.secondaryButton}>
                         Go to Track List
@@ -204,6 +216,27 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         textAlign: 'center',
     },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 30,
+        width: 250,
+        alignItems: 'center',
+    },
+    typeOption: {
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        width: '100%',
+        alignItems: 'center',
+    },
 });
 
 const lightStyles = StyleSheet.create({
@@ -216,5 +249,26 @@ const darkStyles = StyleSheet.create({
     text: { color: '#fff' },
     elapsedTimeText: {
         color: '#ffffff', // Set to white for visibility on black background
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 30,
+        width: 250,
+        alignItems: 'center',
+    },
+    typeOption: {
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        width: '100%',
+        alignItems: 'center',
     },
 });
